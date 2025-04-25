@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concurrent Collections - Real-World Examples</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="concurrent-collections.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Concurrent Collections
+                            </a>
+                            <h1 class="page-title mt-3">Real-World Concurrent Collections Scenarios</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Analytics Dashboard System</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in real-time monitoring platforms</li>
+                                                <li>Concurrent event tracking</li>
+                                                <li>Thread-safe data aggregation</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Multiple threads recording events</li>
+                                                <li>Atomic metric tracking</li>
+                                                <li>Scalable performance metrics</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class AnalyticsDashboard {
+    // Thread-safe map to track event metrics
+    private ConcurrentHashMap<String, LongAdder> metricTracker;
+    
+    public AnalyticsDashboard() {
+        this.metricTracker = new ConcurrentHashMap<>();
+    }
+    
+    // Atomic method to record event
+    public void recordEvent(String eventType) {
+        metricTracker.computeIfAbsent(eventType, k -> new LongAdder())
+                     .increment();
+    }
+    
+    // Thread-safe method to get event count
+    public long getEventCount(String eventType) {
+        LongAdder counter = metricTracker.get(eventType);
+        return counter != null ? counter.sum() : 0;
+    }
+    
+    // Simulate distributed event tracking
+    public static void main(String[] args) {
+        AnalyticsDashboard dashboard = new AnalyticsDashboard();
+        
+        // Different event types
+        String[] eventTypes = {
+            "user_login", 
+            "page_view", 
+            "button_click", 
+            "purchase"
+        };
+        
+        // Create thread pool for concurrent events
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        Random random = new Random();
+        
+        // Simulate multiple threads recording events
+        for (int i = 0; i < 100; i++) {
+            executor.submit(() -> {
+                // Randomly select event type
+                String eventType = eventTypes[random.nextInt(eventTypes.length)];
+                dashboard.recordEvent(eventType);
+            });
+        }
+        
+        // Shutdown executor and wait for completion
+        executor.shutdown();
+        try {
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+            
+            // Print final analytics
+            System.out.println("Analytics Dashboard Report:");
+            for (String eventType : eventTypes) {
+                System.out.println(eventType + ": " + 
+                    dashboard.getEventCount(eventType) + " events");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Distributed Task Queue</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in distributed computing systems</li>
+                                                <li>Parallel task processing</li>
+                                                <li>Work distribution mechanism</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Multiple workers processing tasks</li>
+                                                <li>Thread-safe task queue</li>
+                                                <li>Load balancing</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class DistributedTaskProcessor {
+    // Thread-safe blocking queue for task distribution
+    private BlockingQueue<Task> taskQueue;
+    
+    public DistributedTaskProcessor(int queueCapacity) {
+        this.taskQueue = new LinkedBlockingQueue<>(queueCapacity);
+    }
+    
+    // Submit task to the queue
+    public void submitTask(Task task) throws InterruptedException {
+        taskQueue.put(task);
+    }
+    
+    // Start worker threads
+    public void startWorkers(int workerCount) {
+        for (int i = 0; i < workerCount; i++) {
+            new Thread(new TaskWorker(), "Worker-" + (i + 1)).start();
+        }
+    }
+    
+    // Worker thread implementation
+    private class TaskWorker implements Runnable {
+        @Override
+        public void run() {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    // Take task from queue, wait if empty
+                    Task task = taskQueue.take();
+                    processTask(task);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+        
+        private void processTask(Task task) {
+            System.out.println(
+                Thread.currentThread().getName() + 
+                " processing: " + task
+            );
+            try {
+                // Simulate task processing
+                Thread.sleep(task.getProcessingTime());
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+    
+    // Task model
+    public static class Task {
+        private String name;
+        private long processingTime;
+        
+        public Task(String name, long processingTime) {
+            this.name = name;
+            this.processingTime = processingTime;
+        }
+        
+        public long getProcessingTime() { return processingTime; }
+        
+        @Override
+        public String toString() {
+            return "Task{name='" + name + "'}";
+        }
+    }
+    
+    // Demonstration method
+    public static void main(String[] args) throws InterruptedException {
+        DistributedTaskProcessor processor = 
+            new DistributedTaskProcessor(10);
+        
+        // Start 3 worker threads
+        processor.startWorkers(3);
+        
+        // Submit tasks
+        processor.submitTask(new Task("Task-1", 1000));
+        processor.submitTask(new Task("Task-2", 500));
+        processor.submitTask(new Task("Task-3", 750));
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Concurrent Cache System</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in distributed systems</li>
+                                                <li>Thread-safe data caching</li>
+                                                <li>Concurrent read/write operations</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Multiple threads accessing cache</li>
+                                                <li>Atomic cache updates</li>
+                                                <li>Immutable cache snapshots</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class ConcurrentCacheSystem {
+    // Thread-safe cache using CopyOnWriteArrayList
+    private CopyOnWriteArrayList<CacheEntry> cache;
+    
+    public ConcurrentCacheSystem() {
+        this.cache = new CopyOnWriteArrayList<>();
+    }
+    
+    // Thread-safe cache entry addition
+    public void addEntry(String key, String value) {
+        CacheEntry newEntry = new CacheEntry(key, value);
+        
+        // Remove existing entry with same key if present
+        cache.removeIf(entry -> entry.getKey().equals(key));
+        
+        // Add new entry
+        cache.add(newEntry);
+    }
+    
+    // Thread-safe cache lookup
+    public Optional<String> getEntry(String key) {
+        return cache.stream()
+            .filter(entry -> entry.getKey().equals(key))
+            .map(CacheEntry::getValue)
+            .findFirst();
+    }
+    
+    // Cache entry model
+    private static class CacheEntry {
+        private final String key;
+        private final String value;
+        
+        public CacheEntry(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+        
+        public String getKey() { return key; }
+        public String getValue() { return value; }
+    }
+    
+    // Demonstration method
+    public static void main(String[] args) {
+        ConcurrentCacheSystem cacheSystem = new ConcurrentCacheSystem();
+        
+        // Create thread pool for concurrent cache operations
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        
+        // Simulate multiple threads adding and reading cache entries
+        for (int i = 0; i < 10; i++) {
+            final int threadId = i;
+            executor.submit(() -> {
+                String key = "key-" + threadId;
+                String value = "value-" + threadId;
+                
+                // Add cache entry
+                cacheSystem.addEntry(key, value);
+                
+                // Read cache entry
+                Optional<String> cachedValue = cacheSystem.getEntry(key);
+                cachedValue.ifPresent(v -> 
+                    System.out.println("Thread " + threadId + 
+                        " - Cached: " + key + " = " + v)
+                );
+            });
+        }
+        
+        // Shutdown executor
+        executor.shutdown();
+        try {
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

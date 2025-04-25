@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concurrent Collections - Technical Explanation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="concurrent-collections.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Concurrent Collections
+                            </a>
+                            <h1 class="page-title mt-3">Technical Explanation of Concurrent Collections</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. ConcurrentHashMap</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Thread-safe hash table implementation</li>
+                                                <li><strong>Concurrency Level:</strong> Segment-based locking</li>
+                                                <li><strong>Key Features:</strong>
+                                                    <ul>
+                                                        <li>Multiple threads can read simultaneously</li>
+                                                        <li>Limited locking during writes</li>
+                                                        <li>No full collection locking</li>
+                                                    </ul>
+                                                </li>
+                                                <li><strong>Performance:</strong> High concurrent read/write performance</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="concurrent-hashmap-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+// ConcurrentHashMap usage and thread-safe operations
+ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
+
+// Atomic put if absent
+map.putIfAbsent("key", 42);
+
+// Atomic compute operations
+map.compute("key", (k, v) -> (v == null) ? 1 : v + 1);
+
+// Thread-safe iteration
+map.forEach((key, value) -> {
+    System.out.println(key + ": " + value);
+});
+
+// Atomic get or default
+int value = map.getOrDefault("nonexistent", 0);
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. CopyOnWriteArrayList</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Copy-on-write thread-safe list</li>
+                                                <li><strong>Concurrency Strategy:</strong> 
+                                                    <ul>
+                                                        <li>Create a copy of underlying array for modifications</li>
+                                                        <li>Immutable snapshots during iterations</li>
+                                                    </ul>
+                                                </li>
+                                                <li><strong>Performance Characteristics:</strong>
+                                                    <ul>
+                                                        <li>Optimized for read-heavy scenarios</li>
+                                                        <li>Expensive write operations</li>
+                                                        <li>Consistency over performance</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="copy-on-write-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+// CopyOnWriteArrayList thread-safe operations
+CopyOnWriteArrayList<String> list = new CopyOnWriteArrayList<>();
+
+// Thread-safe addition
+list.add("First Item");
+
+// Safe iteration while modifying
+for (String item : list) {
+    if (item.equals("First Item")) {
+        list.remove(item);
+        list.add("Modified Item");
+    }
+}
+
+// Atomic operations
+list.addIfAbsent("Unique Item");
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. BlockingQueue</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Thread-safe queue with blocking operations</li>
+                                                <li><strong>Key Methods:</strong>
+                                                    <ul>
+                                                        <li>put(): Add element (blocks if full)</li>
+                                                        <li>take(): Remove element (blocks if empty)</li>
+                                                        <li>offer(): Add with timeout</li>
+                                                        <li>poll(): Remove with timeout</li>
+                                                    </ul>
+                                                </li>
+                                                <li><strong>Use Cases:</strong>
+                                                    <ul>
+                                                        <li>Producer-consumer scenarios</li>
+                                                        <li>Thread communication</li>
+                                                        <li>Work queue implementations</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="blocking-queue-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+// BlockingQueue thread-safe operations
+BlockingQueue<Integer> queue = new LinkedBlockingQueue<>(10);
+
+// Producer thread
+new Thread(() -> {
+    try {
+        for (int i = 0; i < 100; i++) {
+            // Blocks if queue is full
+            queue.put(i);
+        }
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+    }
+}).start();
+
+// Consumer thread
+new Thread(() -> {
+    try {
+        while (true) {
+            // Blocks if queue is empty
+            Integer item = queue.take();
+            processItem(item);
+        }
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+    }
+}).start();
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    
+    <script>
+        function createDiagram(containerId, svgContent) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = svgContent;
+            }
+        }
+
+        // ConcurrentHashMap Diagram
+        createDiagram('concurrent-hashmap-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">ConcurrentHashMap</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Segment-Based Locking
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    High Concurrent Performance
+                </text>
+            </svg>
+        `);
+
+        // CopyOnWriteArrayList Diagram
+        createDiagram('copy-on-write-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">CopyOnWriteArrayList</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Immutable Snapshots
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Copy-on-Write Mechanism
+                </text>
+            </svg>
+        `);
+
+        // BlockingQueue Diagram
+        createDiagram('blocking-queue-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">BlockingQueue</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Thread Synchronization
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Producer-Consumer Pattern
+                </text>
+            </svg>
+        `);
+    </script>
+</body>
+</html>
