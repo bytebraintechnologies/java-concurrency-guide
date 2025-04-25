@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Executor Framework Quiz</title>
+    <!-- Tabler Core CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css">
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.22.0/tabler-icons.min.css">
+    <style>
+        body {
+            background-color: #f5f7fb;
+            font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+        }
+        .quiz-container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .question-card {
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(98, 105, 118, 0.16);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .question-card:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+        }
+        .question-card.correct {
+            border-color: #2fb344;
+        }
+        .question-card.incorrect {
+            border-color: #d63939;
+        }
+        .question-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(98, 105, 118, 0.16);
+            background-color: rgba(248, 250, 252, 0.8);
+        }
+        .question-content {
+            padding: 1rem;
+        }
+        .option-label {
+            display: block;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(98, 105, 118, 0.16);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-label:hover {
+            background-color: rgba(32, 107, 196, 0.03);
+        }
+        .option-label.correct {
+            background-color: rgba(47, 179, 68, 0.1);
+            border-color: #2fb344;
+        }
+        .option-label.incorrect {
+            background-color: rgba(214, 57, 57, 0.1);
+            border-color: #d63939;
+        }
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            background-color: #f8fafc;
+            border-left: 3px solid #206bc4;
+            display: none;
+        }
+        .score-card {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 4px;
+            background: linear-gradient(135deg, #206bc4 0%, #4299e1 100%);
+            color: white;
+            margin-bottom: 2rem;
+            display: none;
+        }
+        .score-card h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .progress-container {
+            margin-bottom: 2rem;
+        }
+        nav.navbar {
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                <i class="ti ti-brand-java me-2"></i>
+                Java Multithreading
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Quizzes</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="thread-creation-quiz.html">Thread Creation</a>
+                            <a class="dropdown-item" href="thread-sync-quiz.html">Thread Synchronization</a>
+                            <a class="dropdown-item" href="thread-comm-quiz.html">Thread Communication</a>
+                            <a class="dropdown-item" href="thread-pools-quiz.html">Thread Pools</a>
+                            <a class="dropdown-item active" href="executor-framework-quiz.html">Executor Framework</a>
+                            <a class="dropdown-item" href="concurrent-collections-quiz.html">Concurrent Collections</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="quiz-container">
+            <h1 class="text-center mb-4">Java Executor Framework Quiz</h1>
+            <p class="text-center mb-4">Test your knowledge of the Java Executor Framework with this 5-question quiz.</p>
+            
+            <!-- Progress bar -->
+            <div class="progress-container" id="progress-container">
+                <div class="d-flex justify-content-between mb-1">
+                    <div>Progress</div>
+                    <div id="progress-text">0/5</div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" id="progress-bar" style="width: 0%" role="progressbar"></div>
+                </div>
+            </div>
+            
+            <!-- Quiz content -->
+            <div id="quiz"></div>
+            
+            <!-- Results card -->
+            <div class="score-card" id="score-card">
+                <div class="mb-3">
+                    <i class="ti ti-trophy" style="font-size: 3rem;"></i>
+                </div>
+                <h2 id="score-display">0%</h2>
+                <p id="score-message">You completed the quiz!</p>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button id="submit" class="btn btn-primary">
+                    <i class="ti ti-check me-1"></i>
+                    Submit Quiz
+                </button>
+                <button id="restart" class="btn btn-secondary" style="display:none;">
+                    <i class="ti ti-refresh me-1"></i>
+                    Restart Quiz
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabler Core JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/js/tabler.min.js"></script>
+    
+    <script>
+        const quizData = [
+            {
+                question: "What does the submit() method return?",
+                options: [
+                    "void", 
+                    "Thread", 
+                    "Future", 
+                    "Runnable"
+                ],
+                correctAnswer: "Future",
+                explanation: "The submit() method of ExecutorService returns a Future object representing the pending result of the task. This Future can be used to check if the task has completed, wait for its completion, or retrieve its result."
+            },
+            {
+                question: "Which method waits for all tasks to complete in ExecutorService?",
+                options: [
+                    "waitAll()", 
+                    "invokeAll()", 
+                    "completeAll()", 
+                    "awaitTermination()"
+                ],
+                correctAnswer: "invokeAll()",
+                explanation: "invokeAll() executes a collection of tasks and returns a list of Futures when all tasks complete. Note that awaitTermination() waits for previously submitted tasks to complete after shutdown, but invokeAll() is for submitting and waiting for a specific set of tasks."
+            },
+            {
+                question: "What interface represents a task that returns a value?",
+                options: [
+                    "Runnable", 
+                    "Executor", 
+                    "Callable", 
+                    "Future"
+                ],
+                correctAnswer: "Callable",
+                explanation: "The Callable interface represents a task that returns a value and may throw exceptions. Its call() method returns a value, unlike Runnable's run() method which returns void. ExecutorService can execute both Runnable and Callable tasks."
+            },
+            {
+                question: "What is the primary interface in the Executor Framework?",
+                options: [
+                    "Thread", 
+                    "Executor", 
+                    "ThreadPool", 
+                    "ExecutorService"
+                ],
+                correctAnswer: "Executor",
+                explanation: "Executor is the primary interface in the framework. It defines a simple execute(Runnable) method to run tasks asynchronously. ExecutorService extends Executor to provide more advanced functionality like task submission, shutdown methods, and Future objects."
+            },
+            {
+                question: "What happens when you call shutdownNow() on an ExecutorService?",
+                options: [
+                    "It waits for all tasks to complete", 
+                    "It interrupts all executing tasks and returns a list of waiting tasks", 
+                    "It immediately terminates the JVM", 
+                    "It stops accepting new tasks but completes submitted ones"
+                ],
+                correctAnswer: "It interrupts all executing tasks and returns a list of waiting tasks",
+                explanation: "shutdownNow() attempts to stop all actively executing tasks, halts the processing of waiting tasks, and returns a list of the tasks that were awaiting execution. There are no guarantees about the behavior of actively executing tasks, but typically they will terminate with Thread.interrupt()."
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const submitButton = document.getElementById('submit');
+        const restartButton = document.getElementById('restart');
+        const scoreCard = document.getElementById('score-card');
+        const scoreDisplay = document.getElementById('score-display');
+        const scoreMessage = document.getElementById('score-message');
+
+        // Build quiz
+        function buildQuiz() {
+            // Reset elements
+            scoreCard.style.display = 'none';
+            submitButton.style.display = 'inline-block';
+            restartButton.style.display = 'none';
+            
+            // Shuffle questions
+            const shuffledQuestions = [...quizData].sort(() => 0.5 - Math.random());
+            
+            const output = [];
+            shuffledQuestions.forEach((currentQuestion, questionNumber) => {
+                // Shuffle options
+                const shuffledOptions = [...currentQuestion.options].sort(() => 0.5 - Math.random());
+                
+                const options = [];
+                shuffledOptions.forEach((option, index) => {
+                    options.push(`
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="question${questionNumber}" id="q${questionNumber}o${index}" value="${option}">
+                            <label class="option-label" for="q${questionNumber}o${index}">
+                                ${option}
+                            </label>
+                        </div>
+                    `);
+                });
+
+                output.push(`
+                    <div class="question-card" id="question${questionNumber}">
+                        <div class="question-header">
+                            <h3>Question ${questionNumber + 1}</h3>
+                        </div>
+                        <div class="question-content">
+                            <p class="mb-3">${currentQuestion.question}</p>
+                            <div class="options">
+                                ${options.join('')}
+                            </div>
+                            <div class="explanation" id="explanation${questionNumber}">
+                                <h4 class="mb-2">
+                                    <i class="ti ti-bulb text-yellow me-1"></i>
+                                    Explanation
+                                </h4>
+                                <p>${currentQuestion.explanation}</p>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            });
+
+            quizContainer.innerHTML = output.join('');
+            
+            // Add event listeners to option labels
+            document.querySelectorAll('.option-label').forEach(label => {
+                label.addEventListener('click', function() {
+                    // Find the input and trigger click event
+                    const input = document.getElementById(this.getAttribute('for'));
+                    if (input) {
+                        input.checked = true;
+                    }
+                });
+            });
+        }
+
+        // Show results
+        function showResults() {
+            const questionCards = document.querySelectorAll('.question-card');
+            let numCorrect = 0;
+
+            quizData.forEach((question, questionIndex) => {
+                const questionCard = questionCards[questionIndex];
+                const selector = `input[name=question${questionIndex}]:checked`;
+                const userAnswer = (questionCard.querySelector(selector) || {}).value;
+                const explanation = document.getElementById(`explanation${questionIndex}`);
+                
+                // Show the explanation
+                if (explanation) {
+                    explanation.style.display = 'block';
+                }
+
+                if (userAnswer === question.correctAnswer) {
+                    numCorrect++;
+                    questionCard.classList.add('correct');
+                    
+                    // Mark the correct option
+                    const options = questionCard.querySelectorAll('.option-label');
+                    options.forEach(option => {
+                        if (option.textContent.trim() === question.correctAnswer) {
+                            option.classList.add('correct');
+                        }
+                    });
+                } else {
+                    questionCard.classList.add('incorrect');
+                    
+                    // Mark incorrect and correct options
+                    const options = questionCard.querySelectorAll('.option-label');
+                    options.forEach(option => {
+                        if (option.textContent.trim() === userAnswer) {
+                            option.classList.add('incorrect');
+                        } else if (option.textContent.trim() === question.correctAnswer) {
+                            option.classList.add('correct');
+                        }
+                    });
+                }
+            });
+
+            // Display score
+            const percentage = Math.round((numCorrect / quizData.length) * 100);
+            scoreDisplay.textContent = `${percentage}%`;
+            
+            // Customize score message based on performance
+            if (percentage >= 80) {
+                scoreMessage.textContent = "Excellent! You've mastered Executor Framework concepts!";
+            } else if (percentage >= 60) {
+                scoreMessage.textContent = "Good job! You understand most Executor Framework concepts.";
+            } else {
+                scoreMessage.textContent = "You should review Executor Framework more.";
+            }
+            
+            scoreCard.style.display = 'block';
+            submitButton.style.display = 'none';
+            restartButton.style.display = 'inline-block';
+
+            // Scroll to the top to show score
+            window.scrollTo(0, 0);
+        }
+
+        // Event listeners
+        submitButton.addEventListener('click', showResults);
+        restartButton.addEventListener('click', buildQuiz);
+
+        // Initialize quiz
+        buildQuiz();
+    </script>
+</body>
+</html>

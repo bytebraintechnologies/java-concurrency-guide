@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .quiz-btn {
+            margin-left: 8px;
+        }
+    </style>
 </head>
 <body class="antialiased">
     <div class="page">
@@ -17,6 +22,19 @@
                 </div>
             </div>
             <div class="page-body">
+                <div class="container-xl mb-4">
+                    <div class="alert alert-info">
+                        <div class="d-flex">
+                            <div>
+                                <i class="ti ti-info-circle me-2" style="margin-top: 2px;"></i>
+                            </div>
+                            <div>
+                                <h4 class="alert-title">Test your knowledge!</h4>
+                                <div class="text-secondary">Each topic now has an interactive quiz. Click the "Take Quiz" button on any topic card to test your understanding.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="container-xl">
                     <div class="row row-cards">
                         <div class="col-md-4">
@@ -24,7 +42,12 @@
                                 <div class="card-body">
                                     <h3 class="card-title">Thread Creation</h3>
                                     <p>Learn about different ways to create threads in Java</p>
-                                    <a href="thread-creation.html" class="btn btn-primary">Explore</a>
+                                    <div class="d-flex">
+                                        <a href="thread-creation.html" class="btn btn-primary">Explore</a>
+                                        <a href="quizzes/thread-creation-quiz.html" class="btn btn-success quiz-btn">
+                                            <i class="ti ti-writing"></i> Take Quiz
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -33,7 +56,12 @@
                                 <div class="card-body">
                                     <h3 class="card-title">Thread Synchronization</h3>
                                     <p>Understand synchronization mechanisms</p>
-                                    <a href="thread-sync.html" class="btn btn-primary">Explore</a>
+                                    <div class="d-flex">
+                                        <a href="thread-sync.html" class="btn btn-primary">Explore</a>
+                                        <a href="quizzes/thread-sync-quiz.html" class="btn btn-success quiz-btn">
+                                            <i class="ti ti-writing"></i> Take Quiz
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -42,7 +70,12 @@
                                 <div class="card-body">
                                     <h3 class="card-title">Thread Communication</h3>
                                     <p>Learn about inter-thread communication</p>
-                                    <a href="thread-comm.html" class="btn btn-primary">Explore</a>
+                                    <div class="d-flex">
+                                        <a href="thread-comm.html" class="btn btn-primary">Explore</a>
+                                        <a href="quizzes/thread-comm-quiz.html" class="btn btn-success quiz-btn">
+                                            <i class="ti ti-writing"></i> Take Quiz
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -51,7 +84,12 @@
                                 <div class="card-body">
                                     <h3 class="card-title">Thread Pools</h3>
                                     <p>Explore thread pool concepts</p>
-                                    <a href="thread-pools.html" class="btn btn-primary">Explore</a>
+                                    <div class="d-flex">
+                                        <a href="thread-pools.html" class="btn btn-primary">Explore</a>
+                                        <a href="quizzes/thread-pools-quiz.html" class="btn btn-success quiz-btn">
+                                            <i class="ti ti-writing"></i> Take Quiz
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -60,7 +98,12 @@
                                 <div class="card-body">
                                     <h3 class="card-title">Executor Framework</h3>
                                     <p>Learn about Java's Executor Framework</p>
-                                    <a href="executor-framework.html" class="btn btn-primary">Explore</a>
+                                    <div class="d-flex">
+                                        <a href="executor-framework.html" class="btn btn-primary">Explore</a>
+                                        <a href="quizzes/executor-framework-quiz.html" class="btn btn-success quiz-btn">
+                                            <i class="ti ti-writing"></i> Take Quiz
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -69,10 +112,26 @@
                                 <div class="card-body">
                                     <h3 class="card-title">Concurrent Collections</h3>
                                     <p>Discover thread-safe collections</p>
-                                    <a href="concurrent-collections.html" class="btn btn-primary">Explore</a>
+                                    <div class="d-flex">
+                                        <a href="concurrent-collections.html" class="btn btn-primary">Explore</a>
+                                        <a href="quizzes/concurrent-collections-quiz.html" class="btn btn-success quiz-btn">
+                                            <i class="ti ti-writing"></i> Take Quiz
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-xl mt-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Comprehensive Quiz</h3>
+                        <p>Ready to test your knowledge on all Java multithreading topics? Take our comprehensive quiz that covers all aspects of multithreading.</p>
+                        <a href="multithreading-quiz.html" class="btn btn-primary">
+                            <i class="ti ti-writing"></i> Take Comprehensive Quiz
+                        </a>
                     </div>
                 </div>
             </div>
