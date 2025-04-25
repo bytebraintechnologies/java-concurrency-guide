@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Synchronization - Technical Explanation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="thread-sync.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Thread Synchronization
+                            </a>
+                            <h1 class="page-title mt-3">Technical Explanation of Thread Synchronization</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Synchronized Methods</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Locks entire method for a thread</li>
+                                                <li><strong>Scope:</strong> Entire method becomes a critical section</li>
+                                                <li><strong>Object-level Locking:</strong> Uses object's intrinsic lock</li>
+                                                <li><strong>Performance Impact:</strong> Higher overhead compared to blocks</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="sync-method-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class SynchronizedMethodExample {
+    // Synchronized method prevents concurrent access
+    public synchronized void criticalMethod() {
+        // Only one thread can execute this method at a time
+        // Shared resource modifications happen here
+    }
+    
+    // Alternative explicit synchronization
+    public void explicitSyncMethod() {
+        synchronized(this) {
+            // Synchronized block with same effect
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Synchronized Blocks</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Lock specific code sections</li>
+                                                <li><strong>Granularity:</strong> More fine-grained control</li>
+                                                <li><strong>Performance:</strong> Less overhead than full method sync</li>
+                                                <li><strong>Flexibility:</strong> Can use different lock objects</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="sync-block-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class SynchronizedBlockExample {
+    private final Object lock = new Object();
+    private int sharedResource;
+    
+    public void modifyResource() {
+        // Synchronized block with custom lock object
+        synchronized(lock) {
+            // Critical section
+            sharedResource++;
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Atomic Operations</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Thread-safe operations without explicit locking</li>
+                                                <li><strong>Implementation:</strong> Hardware-level atomic instructions</li>
+                                                <li><strong>Performance:</strong> Very efficient synchronization</li>
+                                                <li><strong>Use Cases:</strong> Counters, simple numeric operations</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="atomic-operation-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class AtomicOperationExample {
+    private AtomicInteger counter = new AtomicInteger(0);
+    
+    public void incrementCounter() {
+        // Atomic increment operation
+        counter.incrementAndGet();
+    }
+    
+    public int getCounterValue() {
+        return counter.get();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    
+    <script>
+        function createDiagram(containerId, svgContent) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = svgContent;
+            }
+        }
+
+        // Synchronized Method Diagram
+        createDiagram('sync-method-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Synchronized Method</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Entire Method Locked
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Intrinsic Lock Mechanism
+                </text>
+            </svg>
+        `);
+
+        // Synchronized Block Diagram
+        createDiagram('sync-block-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Synchronized Block</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Specific Code Section
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Fine-Grained Locking
+                </text>
+            </svg>
+        `);
+
+        // Atomic Operation Diagram
+        createDiagram('atomic-operation-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Atomic Operation</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Hardware-Level Operation
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Thread-Safe without Explicit Locking
+                </text>
+            </svg>
+        `);
+    </script>
+</body>
+</html>

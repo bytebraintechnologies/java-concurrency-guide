@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Synchronization - Real-World Examples</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="thread-sync.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Thread Synchronization
+                            </a>
+                            <h1 class="page-title mt-3">Real-World Thread Synchronization Scenarios</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Banking Transaction System</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in financial transaction platforms</li>
+                                                <li>Prevent race conditions in account operations</li>
+                                                <li>Ensure data integrity</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Concurrent deposit and withdrawal</li>
+                                                <li>Prevent overdrafts</li>
+                                                <li>Thread-safe account management</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class BankAccountSynchronization {
+    public class BankAccount {
+        private double balance;
+        
+        // Synchronized method to prevent race conditions
+        public synchronized void deposit(double amount) {
+            if (amount > 0) {
+                balance += amount;
+                System.out.println(
+                    Thread.currentThread().getName() + 
+                    " deposited $" + amount
+                );
+            }
+        }
+        
+        // Synchronized method for thread-safe withdrawal
+        public synchronized boolean withdraw(double amount) {
+            if (amount > 0 && balance >= amount) {
+                balance -= amount;
+                System.out.println(
+                    Thread.currentThread().getName() + 
+                    " withdrew $" + amount
+                );
+                return true;
+            }
+            return false;
+        }
+        
+        // Atomic get balance operation
+        public synchronized double getBalance() {
+            return balance;
+        }
+    }
+    
+    // Simulate concurrent transactions
+    public void runBankingSimulation() {
+        BankAccount account = new BankAccount();
+        
+        // Multiple threads performing transactions
+        Runnable depositTask = () -> {
+            for (int i = 0; i < 5; i++) {
+                account.deposit(100);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        };
+        
+        Runnable withdrawTask = () -> {
+            for (int i = 0; i < 3; i++) {
+                account.withdraw(50);
+                try {
+                    Thread.sleep(75);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        };
+        
+        // Create and start threads
+        new Thread(depositTask, "Deposit-Thread").start();
+        new Thread(withdrawTask, "Withdraw-Thread").start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Inventory Management System</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in e-commerce platforms</li>
+                                                <li>Prevent overselling</li>
+                                                <li>Manage concurrent stock updates</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Concurrent stock addition and removal</li>
+                                                <li>Prevent negative inventory</li>
+                                                <li>Thread-safe inventory tracking</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class InventoryManagementSystem {
+    public class InventoryManager {
+        private Map<String, Integer> inventory = new HashMap<>();
+        
+        // Synchronized method for adding stock
+        public synchronized void addStock(String productId, int quantity) {
+            inventory.merge(productId, quantity, Integer::sum);
+            System.out.println("Added " + quantity + " of " + productId);
+        }
+        
+        // Synchronized method for removing stock
+        public synchronized boolean removeStock(String productId, int quantity) {
+            Integer currentStock = inventory.get(productId);
+            
+            if (currentStock == null || currentStock < quantity) {
+                System.out.println("Insufficient stock for " + productId);
+                return false;
+            }
+            
+            inventory.put(productId, currentStock - quantity);
+            System.out.println("Removed " + quantity + " of " + productId);
+            return true;
+        }
+        
+        // Atomic stock retrieval
+        public synchronized int getStock(String productId) {
+            return inventory.getOrDefault(productId, 0);
+        }
+    }
+    
+    // Simulate concurrent inventory operations
+    public void runInventorySimulation() {
+        InventoryManager inventory = new InventoryManager();
+        
+        // Initial stock
+        inventory.addStock("LAPTOP-001", 50);
+        
+        // Simulate sales
+        Runnable salesTask = () -> {
+            for (int i = 0; i < 10; i++) {
+                inventory.removeStock("LAPTOP-001", 2);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        };
+        
+        // Simulate restocking
+        Runnable restockTask = () -> {
+            for (int i = 0; i < 5; i++) {
+                inventory.addStock("LAPTOP-001", 5);
+                try {
+                    Thread.sleep(150);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        };
+        
+        // Create and start threads
+        new Thread(salesTask, "Sales-Thread").start();
+        new Thread(restockTask, "Restock-Thread").start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Concurrent Cache System</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in distributed systems</li>
+                                                <li>Manage shared cache resources</li>
+                                                <li>Prevent data inconsistency</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Concurrent cache read and write</li>
+                                                <li>Thread-safe cache operations</li>
+                                                <li>Prevent cache corruption</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class ConcurrentCacheSystem {
+    public class ThreadSafeCache {
+        private Map<String, String> cache = new HashMap<>();
+        private final Object lock = new Object();
+        
+        // Synchronized block for cache write
+        public void put(String key, String value) {
+            synchronized(lock) {
+                cache.put(key, value);
+                System.out.println("Cached: " + key + " = " + value);
+            }
+        }
+        
+        // Synchronized method for cache read
+        public synchronized String get(String key) {
+            return cache.get(key);
+        }
+        
+        // Atomic cache update operation
+        public void updateCache(String key, String value) {
+            synchronized(lock) {
+                String existingValue = cache.get(key);
+                if (existingValue != null) {
+                    cache.put(key, value);
+                    System.out.println("Updated: " + key);
+                }
+            }
+        }
+    }
+    
+    // Simulate concurrent cache operations
+    public void runCacheSimulation() {
+        ThreadSafeCache cache = new ThreadSafeCache();
+        
+        // Cache write threads
+        Runnable writeTask = () -> {
+            for (int i = 0; i < 5; i++) {
+                cache.put("key-" + i, "value-" + i);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        };
+        
+        // Cache read threads
+        Runnable readTask = () -> {
+            for (int i = 0; i < 5; i++) {
+                String key = "key-" + i;
+                String value = cache.get(key);
+                System.out.println("Read: " + key + " = " + value);
+                try {
+                    Thread.sleep(75);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        };
+        
+        // Create and start threads
+        new Thread(writeTask, "Write-Thread").start();
+        new Thread(readTask, "Read-Thread").start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

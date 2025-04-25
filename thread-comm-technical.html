@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Communication - Technical Explanation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="thread-comm.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Thread Communication
+                            </a>
+                            <h1 class="page-title mt-3">Technical Explanation of Thread Communication</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. wait() and notify() Mechanism</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Intrinsic thread communication methods</li>
+                                                <li><strong>Purpose:</strong> Coordinate thread interactions</li>
+                                                <li><strong>Synchronization:</strong> Used within synchronized context</li>
+                                                <li><strong>Methods:</strong>
+                                                    <ul>
+                                                        <li>wait(): Releases lock and suspends thread</li>
+                                                        <li>notify(): Wakes up a waiting thread</li>
+                                                        <li>notifyAll(): Wakes up all waiting threads</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="wait-notify-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class WaitNotifyExample {
+    private synchronized void producerMethod() throws InterruptedException {
+        while (condition) {
+            // Thread goes to waiting state
+            wait();
+        }
+        // Perform production
+        notify(); // Notify waiting consumer
+    }
+    
+    private synchronized void consumerMethod() throws InterruptedException {
+        while (anotherCondition) {
+            // Thread goes to waiting state
+            wait();
+        }
+        // Perform consumption
+        notify(); // Notify waiting producer
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Blocking Queue Communication</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Thread-safe data transfer mechanism</li>
+                                                <li><strong>Implementation:</strong> Concurrent data structure</li>
+                                                <li><strong>Key Methods:</strong>
+                                                    <ul>
+                                                        <li>put(): Adds element (blocks if full)</li>
+                                                        <li>take(): Removes element (blocks if empty)</li>
+                                                        <li>offer(): Adds element (returns false if full)</li>
+                                                        <li>poll(): Removes element (returns null if empty)</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="blocking-queue-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class BlockingQueueExample {
+    private BlockingQueue<Integer> queue = 
+        new LinkedBlockingQueue<>(10);
+    
+    public void producer() throws InterruptedException {
+        for (int i = 0; i < 100; i++) {
+            // Blocks if queue is full
+            queue.put(i);
+        }
+    }
+    
+    public void consumer() throws InterruptedException {
+        while (true) {
+            // Blocks if queue is empty
+            Integer item = queue.take();
+            processItem(item);
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Condition Variables</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Advanced thread synchronization</li>
+                                                <li><strong>Flexibility:</strong> More precise than wait/notify</li>
+                                                <li><strong>Key Components:</strong>
+                                                    <ul>
+                                                        <li>Lock for synchronization</li>
+                                                        <li>Condition for thread waiting</li>
+                                                        <li>Explicit signaling</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="condition-variables-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class ConditionVariableExample {
+    private final Lock lock = new ReentrantLock();
+    private final Condition dataAvailable = lock.newCondition();
+    private boolean hasData = false;
+    
+    public void producer() throws InterruptedException {
+        lock.lock();
+        try {
+            while (hasData) {
+                // Wait if data is not consumed
+                dataAvailable.await();
+            }
+            // Produce data
+            hasData = true;
+            dataAvailable.signal();
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    public void consumer() throws InterruptedException {
+        lock.lock();
+        try {
+            while (!hasData) {
+                // Wait if no data is available
+                dataAvailable.await();
+            }
+            // Consume data
+            hasData = false;
+            dataAvailable.signal();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    
+    <script>
+        function createDiagram(containerId, svgContent) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = svgContent;
+            }
+        }
+
+        // Wait and Notify Diagram
+        createDiagram('wait-notify-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">wait() and notify()</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Thread Synchronization
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Intrinsic Lock Communication
+                </text>
+            </svg>
+        `);
+
+        // Blocking Queue Diagram
+        createDiagram('blocking-queue-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Blocking Queue</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Thread-Safe Data Transfer
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Synchronized Data Exchange
+                </text>
+            </svg>
+        `);
+
+        // Condition Variables Diagram
+        createDiagram('condition-variables-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Condition Variables</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Advanced Thread Coordination
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Precise Thread Synchronization
+                </text>
+            </svg>
+        `);
+    </script>
+</body>
+</html>
