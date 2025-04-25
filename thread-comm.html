@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Communication - Java Multithreading</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header">
+                <div class="container-xl">
+                    <h1 class="page-title">Thread Communication in Java</h1>
+                </div>
+            </div>
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. wait() and notify() Methods</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class ProducerConsumer {
+    private int data;
+    private boolean empty = true;
+    
+    public synchronized void produce(int value) throws InterruptedException {
+        while (!empty) {
+            wait(); // Wait if buffer is full
+        }
+        data = value;
+        empty = false;
+        notify(); // Notify consumer
+    }
+    
+    public synchronized int consume() throws InterruptedException {
+        while (empty) {
+            wait(); // Wait if buffer is empty
+        }
+        empty = true;
+        notify(); // Notify producer
+        return data;
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>2. Blocking Queue</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class BlockingQueueExample {
+    public static void main(String[] args) {
+        BlockingQueue<Integer> queue = new LinkedBlockingQueue<>(10);
+        
+        Thread producer = new Thread(() -> {
+            try {
+                for (int i = 0; i < 20; i++) {
+                    queue.put(i); // Blocks if queue is full
+                    System.out.println("Produced: " + i);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        
+        Thread consumer = new Thread(() -> {
+            try {
+                for (int i = 0; i < 20; i++) {
+                    int value = queue.take(); // Blocks if queue is empty
+                    System.out.println("Consumed: " + value);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        
+        producer.start();
+        consumer.start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>3. Condition Variables</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class ConditionVariableExample {
+    private final Lock lock = new ReentrantLock();
+    private final Condition notFull = lock.newCondition();
+    private final Condition notEmpty = lock.newCondition();
+    private final int[] buffer = new int[10];
+    private int count = 0;
+    
+    public void produce(int value) throws InterruptedException {
+        lock.lock();
+        try {
+            while (count == buffer.length) {
+                notFull.await(); // Wait if buffer is full
+            }
+            buffer[count++] = value;
+            notEmpty.signal(); // Signal that buffer is not empty
+        } finally {
+            lock.unlock();
+        }
+    }
+    
+    public int consume() throws InterruptedException {
+        lock.lock();
+        try {
+            while (count == 0) {
+                notEmpty.await(); // Wait if buffer is empty
+            }
+            int value = buffer[--count];
+            notFull.signal(); // Signal that buffer is not full
+            return value;
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

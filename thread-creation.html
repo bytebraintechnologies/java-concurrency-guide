@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Creation - Java Multithreading</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header">
+                <div class="container-xl">
+                    <h1 class="page-title">Thread Creation in Java</h1>
+                </div>
+            </div>
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Extending Thread Class</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+class MyThread extends Thread {
+    public void run() {
+        System.out.println("Thread running");
+    }
+}
+
+public class ThreadExample {
+    public static void main(String[] args) {
+        MyThread thread = new MyThread();
+        thread.start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>2. Implementing Runnable Interface</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+class MyRunnable implements Runnable {
+    public void run() {
+        System.out.println("Runnable thread running");
+    }
+}
+
+public class RunnableExample {
+    public static void main(String[] args) {
+        Thread thread = new Thread(new MyRunnable());
+        thread.start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>3. Anonymous Class</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class AnonymousThreadExample {
+    public static void main(String[] args) {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                System.out.println("Anonymous thread running");
+            }
+        });
+        thread.start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>4. Lambda Expression (Java 8+)</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class LambdaThreadExample {
+    public static void main(String[] args) {
+        Thread thread = new Thread(() -> {
+            System.out.println("Lambda thread running");
+        });
+        thread.start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concurrent Collections - Java Multithreading</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header">
+                <div class="container-xl">
+                    <h1 class="page-title">Concurrent Collections in Java</h1>
+                </div>
+            </div>
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. ConcurrentHashMap</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.ConcurrentHashMap;
+
+public class ConcurrentHashMapExample {
+    public static void main(String[] args) {
+        ConcurrentHashMap<String, Integer> map = 
+            new ConcurrentHashMap<>();
+        
+        // Thread-safe operations
+        map.put("Apple", 1);
+        map.putIfAbsent("Banana", 2);
+        
+        // Atomic operations
+        map.compute("Apple", (k, v) -> v == null ? 1 : v + 1);
+        
+        // Thread-safe iteration
+        map.forEach((key, value) -> 
+            System.out.println(key + ": " + value));
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>2. CopyOnWriteArrayList</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.CopyOnWriteArrayList;
+
+public class CopyOnWriteArrayListExample {
+    public static void main(String[] args) {
+        CopyOnWriteArrayList<String> list = 
+            new CopyOnWriteArrayList<>();
+        
+        // Multiple threads can read safely
+        list.add("First");
+        list.add("Second");
+        
+        // Iterate while modifying
+        for (String item : list) {
+            if (item.equals("First")) {
+                list.remove(item);
+                list.add("Modified");
+            }
+        }
+        
+        // Safe iteration
+        list.forEach(System.out::println);
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>3. BlockingQueue</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class BlockingQueueExample {
+    public static void main(String[] args) {
+        BlockingQueue<String> queue = 
+            new LinkedBlockingQueue<>(10);
+        
+        // Producer thread
+        new Thread(() -> {
+            try {
+                for (int i = 0; i < 20; i++) {
+                    queue.put("Item " + i);
+                    System.out.println("Produced: Item " + i);
+                    Thread.sleep(100);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+        
+        // Consumer thread
+        new Thread(() -> {
+            try {
+                for (int i = 0; i < 20; i++) {
+                    String item = queue.take();
+                    System.out.println("Consumed: " + item);
+                    Thread.sleep(200);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

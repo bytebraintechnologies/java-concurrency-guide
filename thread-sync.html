@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Synchronization - Java Multithreading</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header">
+                <div class="container-xl">
+                    <h1 class="page-title">Thread Synchronization in Java</h1>
+                </div>
+            </div>
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Synchronized Method</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class Counter {
+    private int count = 0;
+    
+    public synchronized void increment() {
+        count++;
+    }
+    
+    public synchronized int getCount() {
+        return count;
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>2. Synchronized Block</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class SharedResource {
+    private final Object lock = new Object();
+    private int value;
+    
+    public void criticalSection() {
+        synchronized(lock) {
+            // Thread-safe operations
+            value++;
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>3. Atomic Operations</h2>
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class AtomicCounter {
+    private AtomicInteger count = new AtomicInteger(0);
+    
+    public void increment() {
+        count.incrementAndGet();
+    }
+    
+    public int getCount() {
+        return count.get();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>
