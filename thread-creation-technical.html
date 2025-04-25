@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Creation - Technical Explanation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="thread-creation.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Thread Creation
+                            </a>
+                            <h1 class="page-title mt-3">Technical Explanation of Thread Creation</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Thread Inheritance Technique</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Extends java.lang.Thread class</li>
+                                                <li><strong>Core Method:</strong> Override run() method</li>
+                                                <li><strong>Thread Lifecycle Management:</strong> Directly controlled by subclass</li>
+                                                <li><strong>Inheritance Limitation:</strong> Java supports single inheritance</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="thread-inheritance-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+// Thread Inheritance Technique
+class MyThread extends Thread {
+    public void run() {
+        // Thread's core logic
+        System.out.println("Thread running: " + getName());
+    }
+}
+
+// Usage
+MyThread thread = new MyThread();
+thread.start(); // Starts thread execution
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Runnable Interface Technique</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Implements java.lang.Runnable interface</li>
+                                                <li><strong>Core Method:</strong> Implement run() method</li>
+                                                <li><strong>Thread Creation:</strong> Pass to Thread constructor</li>
+                                                <li><strong>Flexibility:</strong> Allows multiple interface implementation</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="runnable-interface-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+// Runnable Interface Technique
+class MyRunnable implements Runnable {
+    public void run() {
+        // Thread's core logic
+        System.out.println("Runnable thread executing");
+    }
+}
+
+// Usage
+Thread thread = new Thread(new MyRunnable());
+thread.start(); // Starts thread execution
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Lambda Thread Creation</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Functional interface implementation</li>
+                                                <li><strong>Core Concept:</strong> Compact, inline thread definition</li>
+                                                <li><strong>Java Version:</strong> Introduced in Java 8+</li>
+                                                <li><strong>Syntax:</strong> () -> { /* Thread Logic */ }</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="lambda-thread-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+// Lambda Thread Creation (Java 8+)
+Thread thread = new Thread(() -> {
+    // Inline thread logic
+    System.out.println("Lambda thread executing");
+});
+thread.start(); // Starts thread execution
+
+// With ExecutorService
+ExecutorService executor = Executors.newFixedThreadPool(4);
+executor.submit(() -> {
+    // Concise thread task
+    System.out.println("Executor lambda thread");
+});
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    
+    <script>
+        // Inline SVG for diagrams
+        function createDiagram(containerId, svgContent) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = svgContent;
+            }
+        }
+
+        // Thread Inheritance Diagram
+        createDiagram('thread-inheritance-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Thread Inheritance</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Custom Thread Class
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Extends Thread Class
+                </text>
+            </svg>
+        `);
+
+        // Runnable Interface Diagram
+        createDiagram('runnable-interface-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Runnable Interface</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Custom Runnable Class
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Implements Runnable Interface
+                </text>
+            </svg>
+        `);
+
+        // Lambda Thread Diagram
+        createDiagram('lambda-thread-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Lambda Thread Creation</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle" font-size="14">
+                    () -> { /* Task Logic */ }
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Functional Interface Implementation
+                </text>
+            </svg>
+        `);
+    </script>
+</body>
+</html>

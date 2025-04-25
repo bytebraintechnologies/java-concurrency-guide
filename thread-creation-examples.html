@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Creation - Real-World Examples</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="thread-creation.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Thread Creation
+                            </a>
+                            <h1 class="page-title mt-3">Real-World Thread Creation Scenarios</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Image Processing System</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in photo editing applications</li>
+                                                <li>Parallel image transformation</li>
+                                                <li>Reduces processing time</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Batch image filtering</li>
+                                                <li>Concurrent image transformations</li>
+                                                <li>Efficient resource utilization</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class ImageProcessingSystem {
+    public static void processImages(List<BufferedImage> images) {
+        // Thread Inheritance Approach
+        List<ImageProcessorThread> processorThreads = new ArrayList<>();
+        
+        for (BufferedImage image : images) {
+            ImageProcessorThread processorThread = 
+                new ImageProcessorThread(image);
+            processorThread.start();
+            processorThreads.add(processorThread);
+        }
+        
+        // Wait for all threads to complete
+        for (ImageProcessorThread thread : processorThreads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+    
+    // Custom Thread for Image Processing
+    static class ImageProcessorThread extends Thread {
+        private BufferedImage image;
+        
+        public ImageProcessorThread(BufferedImage image) {
+            this.image = image;
+        }
+        
+        @Override
+        public void run() {
+            applyFilter(image);
+        }
+        
+        private void applyFilter(BufferedImage img) {
+            // Simulate complex image processing
+            for (int y = 0; y < img.getHeight(); y++) {
+                for (int x = 0; x < img.getWidth(); x++) {
+                    int rgb = img.getRGB(x, y);
+                    int filteredRgb = processPixel(rgb);
+                    img.setRGB(x, y, filteredRgb);
+                }
+            }
+        }
+        
+        private int processPixel(int rgb) {
+            // Example: Simple grayscale conversion
+            int r = (rgb >> 16) & 0xFF;
+            int g = (rgb >> 8) & 0xFF;
+            int b = rgb & 0xFF;
+            
+            int gray = (r + g + b) / 3;
+            return (gray << 16) | (gray << 8) | gray;
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Stock Market Data Aggregator</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in financial trading platforms</li>
+                                                <li>Concurrent data retrieval</li>
+                                                <li>Real-time market analysis</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Fetch stock data from multiple sources</li>
+                                                <li>Parallel data collection</li>
+                                                <li>Aggregate market information</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class StockMarketDataAggregator {
+    public static void collectStockData(List<String> stockSymbols) {
+        // Runnable Interface Approach
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        
+        for (String symbol : stockSymbols) {
+            executor.submit(new StockDataFetcher(symbol));
+        }
+        
+        // Shutdown executor after tasks complete
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+    
+    // Runnable implementation for stock data fetching
+    static class StockDataFetcher implements Runnable {
+        private String stockSymbol;
+        
+        public StockDataFetcher(String stockSymbol) {
+            this.stockSymbol = stockSymbol;
+        }
+        
+        @Override
+        public void run() {
+            try {
+                StockData data = fetchStockData(stockSymbol);
+                processStockData(data);
+            } catch (Exception e) {
+                System.err.println("Error fetching stock data: " + stockSymbol);
+            }
+        }
+        
+        private StockData fetchStockData(String symbol) {
+            // Simulate API call
+            return new StockData(
+                symbol, 
+                Math.random() * 100, 
+                System.currentTimeMillis()
+            );
+        }
+        
+        private void processStockData(StockData data) {
+            // Store or analyze stock data
+            System.out.println("Processed: " + data);
+        }
+    }
+    
+    // Simple Stock Data Model
+    static class StockData {
+        private String symbol;
+        private double price;
+        private long timestamp;
+        
+        public StockData(String symbol, double price, long timestamp) {
+            this.symbol = symbol;
+            this.price = price;
+            this.timestamp = timestamp;
+        }
+        
+        @Override
+        public String toString() {
+            return "StockData{" +
+                   "symbol='" + symbol + '\'' +
+                   ", price=" + price +
+                   ", timestamp=" + timestamp +
+                   '}';
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Log Processing System</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in system monitoring</li>
+                                                <li>Distributed log analysis</li>
+                                                <li>Performance tracking</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Process logs from multiple sources</li>
+                                                <li>Lambda-based thread creation</li>
+                                                <li>Concurrent log parsing</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class LogProcessingSystem {
+    public static void processLogs(List<Path> logFiles) {
+        // Lambda-based Thread Creation
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        
+        logFiles.forEach(logFile -> 
+            executor.submit(() -> {
+                try {
+                    processLogFile(logFile);
+                } catch (IOException e) {
+                    System.err.println("Error processing log: " + logFile);
+                }
+            })
+        );
+        
+        // Shutdown executor
+        executor.shutdown();
+        try {
+            executor.awaitTermination(5, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+    
+    private static void processLogFile(Path logFile) throws IOException {
+        // Read and analyze log file
+        List<String> lines = Files.readAllLines(logFile);
+        
+        long errorCount = lines.stream()
+            .filter(line -> line.contains("ERROR"))
+            .count();
+        
+        System.out.println(
+            "Log: " + logFile.getFileName() + 
+            ", Error Count: " + errorCount
+        );
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>
