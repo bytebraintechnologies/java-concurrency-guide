@@ -11,93 +11,291 @@
 <body class="antialiased">
     <div class="page">
         <div class="page-wrapper">
-            <div class="page-header">
+            <div class="page-header d-print-none">
                 <div class="container-xl">
-                    <h1 class="page-title">Thread Creation in Java</h1>
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="index.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Home
+                            </a>
+                            <h1 class="page-title mt-3">Thread Creation in Java</h1>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
             <div class="page-body">
                 <div class="container-xl">
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h2>1. Extending Thread Class</h2>
-                                    <div class="code-section">
-                                        <pre><code class="language-java">
-class MyThread extends Thread {
-    public void run() {
-        System.out.println("Thread running");
-    }
-}
+                                    <h2>1. Understanding Thread Creation</h2>
+                                    
+                                    <div class="mb-3">
+                                        <h3>Pseudocode: Thread Creation Concepts</h3>
+                                        <pre><code class="language-text">
+// Pseudocode for Thread Creation Patterns
 
-public class ThreadExample {
-    public static void main(String[] args) {
-        MyThread thread = new MyThread();
-        thread.start();
-    }
-}
+// Method 1: Inheritance-based Thread Creation
+class InheritanceThread extends BaseThread:
+    override run_method():
+        // Define thread's core logic
+        execute_specific_task()
+
+// Method 2: Interface-based Thread Creation
+class InterfaceThread implements Runnable:
+    run_method():
+        // Define thread's core logic
+        execute_specific_task()
+
+// Method 3: Anonymous Class Creation
+create_thread_with_anonymous_class():
+    new Thread(new Runnable():
+        run_method():
+            // Inline thread logic
+            execute_task_directly()
+    ).start()
+
+// Method 4: Lambda-based Thread Creation (Modern Java)
+create_thread_with_lambda():
+    new Thread(() -> {
+        // Compact thread logic
+        execute_task_directly()
+    }).start()
                                         </code></pre>
+                                    </div>
+                                    
+                                    <div class="alert alert-important" role="alert">
+                                        <h4>Key Thread Creation Principles</h4>
+                                        <ul>
+                                            <li>Define thread's primary task/logic</li>
+                                            <li>Choose appropriate creation method</li>
+                                            <li>Understand thread lifecycle</li>
+                                            <li>Manage thread resources efficiently</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="card">
+                            <div class="card mt-4">
                                 <div class="card-body">
-                                    <h2>2. Implementing Runnable Interface</h2>
-                                    <div class="code-section">
-                                        <pre><code class="language-java">
-class MyRunnable implements Runnable {
-    public void run() {
-        System.out.println("Runnable thread running");
-    }
-}
-
-public class RunnableExample {
-    public static void main(String[] args) {
-        Thread thread = new Thread(new MyRunnable());
-        thread.start();
-    }
-}
-                                        </code></pre>
+                                    <h2>2. Real-World Scenario: Parallel Image Processing System</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Problem Scenario</h3>
+                                            <ul>
+                                                <li>Large batch of images to process</li>
+                                                <li>Need for concurrent image transformations</li>
+                                                <li>Optimize processing time and resource usage</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Thread Creation Solution</h3>
+                                            <ul>
+                                                <li>Multiple thread creation strategies</li>
+                                                <li>Parallel image processing</li>
+                                                <li>Efficient resource utilization</li>
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <h2>3. Anonymous Class</h2>
-                                    <div class="code-section">
+                                    
+                                    <div class="code-section mt-3">
                                         <pre><code class="language-java">
-public class AnonymousThreadExample {
-    public static void main(String[] args) {
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
-                System.out.println("Anonymous thread running");
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.imageio.ImageIO;
+
+// Image Processing Demonstration
+public class ParallelImageProcessor {
+    // Method 1: Thread Inheritance Approach
+    static class ImageProcessingThread extends Thread {
+        private BufferedImage image;
+        
+        public ImageProcessingThread(BufferedImage image) {
+            this.image = image;
+        }
+        
+        @Override
+        public void run() {
+            applyGrayscaleFilter(image);
+        }
+        
+        private void applyGrayscaleFilter(BufferedImage image) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                for (int x = 0; x < image.getWidth(); x++) {
+                    int rgb = image.getRGB(x, y);
+                    int r = (rgb >> 16) & 0xFF;
+                    int g = (rgb >> 8) & 0xFF;
+                    int b = rgb & 0xFF;
+                    
+                    int gray = (r + g + b) / 3;
+                    int grayRGB = (gray << 16) | (gray << 8) | gray;
+                    
+                    image.setRGB(x, y, grayRGB);
+                }
             }
-        });
-        thread.start();
+            System.out.println("Processed image in thread: " + Thread.currentThread().getName());
+        }
+    }
+    
+    // Method 2: Runnable Interface Approach
+    static class ImageProcessingRunnable implements Runnable {
+        private BufferedImage image;
+        
+        public ImageProcessingRunnable(BufferedImage image) {
+            this.image = image;
+        }
+        
+        @Override
+        public void run() {
+            applyBrightnessFilter(image);
+        }
+        
+        private void applyBrightnessFilter(BufferedImage image) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                for (int x = 0; x < image.getWidth(); x++) {
+                    int rgb = image.getRGB(x, y);
+                    int r = Math.min(255, ((rgb >> 16) & 0xFF) + 50);
+                    int g = Math.min(255, ((rgb >> 8) & 0xFF) + 50);
+                    int b = Math.min(255, (rgb & 0xFF) + 50);
+                    
+                    int brightenedRGB = (r << 16) | (g << 8) | b;
+                    image.setRGB(x, y, brightenedRGB);
+                }
+            }
+            System.out.println("Processed image in thread: " + Thread.currentThread().getName());
+        }
+    }
+    
+    public static void main(String[] args) {
+        try {
+            // Load sample images
+            List<BufferedImage> images = loadImages();
+            
+            // Method 1: Thread Inheritance Approach
+            List<Thread> inheritanceThreads = new ArrayList<>();
+            for (BufferedImage image : images) {
+                ImageProcessingThread thread = new ImageProcessingThread(image);
+                thread.start();
+                inheritanceThreads.add(thread);
+            }
+            
+            // Wait for inheritance threads to complete
+            for (Thread thread : inheritanceThreads) {
+                thread.join();
+            }
+            
+            // Method 2: Runnable Interface with ExecutorService
+            ExecutorService executor = Executors.newFixedThreadPool(4);
+            for (BufferedImage image : images) {
+                executor.submit(new ImageProcessingRunnable(image));
+            }
+            
+            // Shutdown executor
+            executor.shutdown();
+            executor.awaitTermination(1, java.util.concurrent.TimeUnit.MINUTES);
+            
+            System.out.println("All image processing completed!");
+            
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    // Utility method to load sample images
+    private static List<BufferedImage> loadImages() {
+        List<BufferedImage> images = new ArrayList<>();
+        try {
+            // Replace with actual image loading logic
+            BufferedImage sampleImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+            images.add(sampleImage);
+            images.add(sampleImage);
+            images.add(sampleImage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return images;
     }
 }
                                         </code></pre>
                                     </div>
+                                    
+                                    <div class="mt-3">
+                                        <h3>Industry Impact</h3>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h4>Where Used</h4>
+                                                <ul>
+                                                    <li>Image Processing Software</li>
+                                                    <li>Video Editing Tools</li>
+                                                    <li>Machine Learning Pipelines</li>
+                                                    <li>Batch Image Transformation</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h4>Benefits</h4>
+                                                <ul>
+                                                    <li>Parallel Image Processing</li>
+                                                    <li>Reduced Processing Time</li>
+                                                    <li>Efficient Resource Utilization</li>
+                                                    <li>Scalable Architecture</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="card">
+                            <div class="card mt-4">
                                 <div class="card-body">
-                                    <h2>4. Lambda Expression (Java 8+)</h2>
-                                    <div class="code-section">
-                                        <pre><code class="language-java">
-public class LambdaThreadExample {
-    public static void main(String[] args) {
-        Thread thread = new Thread(() -> {
-            System.out.println("Lambda thread running");
-        });
-        thread.start();
-    }
-}
-                                        </code></pre>
+                                    <h2>3. Modern Thread Creation Techniques</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h3>Lambda Expression</h3>
+                                                    <pre><code class="language-java">
+// Compact thread creation
+new Thread(() -> {
+    // Inline task logic
+    System.out.println("Lambda Thread");
+}).start();
+                                                    </code></pre>
+                                                    <p>Concise, functional-style thread creation</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h3>Executor Framework</h3>
+                                                    <pre><code class="language-java">
+ExecutorService executor = 
+    Executors.newFixedThreadPool(4);
+executor.submit(() -> {
+    // Task to execute
+    System.out.println("Executor Thread");
+});
+                                                    </code></pre>
+                                                    <p>Advanced thread management</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

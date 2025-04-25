@@ -11,118 +11,253 @@
 <body class="antialiased">
     <div class="page">
         <div class="page-wrapper">
-            <div class="page-header">
+            <div class="page-header d-print-none">
                 <div class="container-xl">
-                    <h1 class="page-title">Concurrent Collections in Java</h1>
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="index.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Home
+                            </a>
+                            <h1 class="page-title mt-3">Concurrent Collections in Java</h1>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
             <div class="page-body">
                 <div class="container-xl">
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h2>1. ConcurrentHashMap</h2>
-                                    <div class="code-section">
+                                    <h2>1. Understanding Concurrent Collections</h2>
+                                    
+                                    <div class="mb-3">
+                                        <h3>Pseudocode: Concurrent Collection Concept</h3>
+                                        <pre><code class="language-text">
+// Pseudocode for Concurrent Collection Operations
+
+class ConcurrentCollection:
+    internal_storage = thread_safe_storage()
+    access_lock = create_reentrant_lock()
+    
+    function safe_add(item):
+        acquire(access_lock)
+        try:
+            // Atomic addition operation
+            add_item_to_storage(item)
+        finally:
+            release(access_lock)
+    
+    function safe_remove(item):
+        acquire(access_lock)
+        try:
+            // Atomic removal operation
+            remove_item_from_storage(item)
+        finally:
+            release(access_lock)
+    
+    function safe_iterate():
+        create_snapshot_of_collection()
+        iterate_without_blocking_other_operations()
+                                        </code></pre>
+                                    </div>
+                                    
+                                    <div class="alert alert-important" role="alert">
+                                        <h4>Key Concurrent Collection Principles</h4>
+                                        <ul>
+                                            <li>Thread-safe data structures</li>
+                                            <li>Minimize synchronization overhead</li>
+                                            <li>Support concurrent read and write operations</li>
+                                            <li>Prevent race conditions</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Real-World Scenario: Distributed Analytics Dashboard</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Problem Scenario</h3>
+                                            <ul>
+                                                <li>Multiple threads collecting analytics data</li>
+                                                <li>Concurrent updates from different sources</li>
+                                                <li>Need for thread-safe data aggregation</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Concurrent Collection Solution</h3>
+                                            <ul>
+                                                <li>Use ConcurrentHashMap for thread-safe storage</li>
+                                                <li>Atomic operations without explicit locking</li>
+                                                <li>Efficient concurrent data management</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section mt-3">
                                         <pre><code class="language-java">
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.Random;
 
-public class ConcurrentHashMapExample {
-    public static void main(String[] args) {
-        ConcurrentHashMap<String, Integer> map = 
-            new ConcurrentHashMap<>();
-        
-        // Thread-safe operations
-        map.put("Apple", 1);
-        map.putIfAbsent("Banana", 2);
-        
-        // Atomic operations
-        map.compute("Apple", (k, v) -> v == null ? 1 : v + 1);
-        
-        // Thread-safe iteration
-        map.forEach((key, value) -> 
-            System.out.println(key + ": " + value));
+// Distributed Analytics Dashboard Simulator
+public class AnalyticsDashboard {
+    // Thread-safe map to store analytics data
+    private ConcurrentHashMap<String, LongAdder> metricTracker;
+    
+    public AnalyticsDashboard() {
+        this.metricTracker = new ConcurrentHashMap<>();
     }
-}
-                                        </code></pre>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <h2>2. CopyOnWriteArrayList</h2>
-                                    <div class="code-section">
-                                        <pre><code class="language-java">
-import java.util.concurrent.CopyOnWriteArrayList;
-
-public class CopyOnWriteArrayListExample {
+    
+    // Atomic method to record event
+    public void recordEvent(String eventType) {
+        // Automatically handles concurrent updates
+        metricTracker.computeIfAbsent(eventType, k -> new LongAdder())
+                     .increment();
+    }
+    
+    // Thread-safe method to get event count
+    public long getEventCount(String eventType) {
+        LongAdder counter = metricTracker.get(eventType);
+        return counter != null ? counter.sum() : 0;
+    }
+    
+    // Simulate distributed event tracking
     public static void main(String[] args) {
-        CopyOnWriteArrayList<String> list = 
-            new CopyOnWriteArrayList<>();
+        AnalyticsDashboard dashboard = new AnalyticsDashboard();
         
-        // Multiple threads can read safely
-        list.add("First");
-        list.add("Second");
+        // Different event types
+        String[] eventTypes = {
+            "user_login", 
+            "page_view", 
+            "button_click", 
+            "purchase"
+        };
         
-        // Iterate while modifying
-        for (String item : list) {
-            if (item.equals("First")) {
-                list.remove(item);
-                list.add("Modified");
-            }
+        // Create thread pool for concurrent events
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        Random random = new Random();
+        
+        // Simulate multiple threads recording events
+        for (int i = 0; i < 100; i++) {
+            executor.submit(() -> {
+                // Randomly select event type
+                String eventType = eventTypes[random.nextInt(eventTypes.length)];
+                dashboard.recordEvent(eventType);
+            });
         }
         
-        // Safe iteration
-        list.forEach(System.out::println);
+        // Shutdown executor and wait for completion
+        executor.shutdown();
+        
+        // Print final analytics
+        try {
+            executor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS);
+            
+            System.out.println("Analytics Dashboard Report:");
+            for (String eventType : eventTypes) {
+                System.out.println(eventType + ": " + 
+                    dashboard.getEventCount(eventType) + " events");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
                                         </code></pre>
                                     </div>
+                                    
+                                    <div class="mt-3">
+                                        <h3>Industry Impact</h3>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h4>Where Used</h4>
+                                                <ul>
+                                                    <li>Real-time Analytics Platforms</li>
+                                                    <li>Monitoring Systems</li>
+                                                    <li>High-Concurrency Web Applications</li>
+                                                    <li>Distributed Computing</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h4>Benefits</h4>
+                                                <ul>
+                                                    <li>Thread-Safe Data Aggregation</li>
+                                                    <li>Low Synchronization Overhead</li>
+                                                    <li>Scalable Data Tracking</li>
+                                                    <li>Consistent Concurrent Updates</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="card">
+                            <div class="card mt-4">
                                 <div class="card-body">
-                                    <h2>3. BlockingQueue</h2>
-                                    <div class="code-section">
-                                        <pre><code class="language-java">
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
-public class BlockingQueueExample {
-    public static void main(String[] args) {
-        BlockingQueue<String> queue = 
-            new LinkedBlockingQueue<>(10);
-        
-        // Producer thread
-        new Thread(() -> {
-            try {
-                for (int i = 0; i < 20; i++) {
-                    queue.put("Item " + i);
-                    System.out.println("Produced: Item " + i);
-                    Thread.sleep(100);
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }).start();
-        
-        // Consumer thread
-        new Thread(() -> {
-            try {
-                for (int i = 0; i < 20; i++) {
-                    String item = queue.take();
-                    System.out.println("Consumed: " + item);
-                    Thread.sleep(200);
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }).start();
-    }
+                                    <h2>3. Common Concurrent Collections</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h3>ConcurrentHashMap</h3>
+                                                    <pre><code class="language-java">
+ConcurrentHashMap<String, Integer> map = 
+    new ConcurrentHashMap<>();
+map.put("key", 42);
+map.computeIfAbsent("newKey", 
+    k -> calculateValue());
+                                                    </code></pre>
+                                                    <p>Thread-safe key-value storage</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h3>CopyOnWriteArrayList</h3>
+                                                    <pre><code class="language-java">
+CopyOnWriteArrayList<String> list = 
+    new CopyOnWriteArrayList<>();
+list.add("item");
+// Safe to iterate while modifying
+for (String item : list) {
+    // Process item
 }
-                                        </code></pre>
+                                                    </code></pre>
+                                                    <p>Thread-safe list with copy-on-write</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h3>BlockingQueue</h3>
+                                                    <pre><code class="language-java">
+BlockingQueue<Task> queue = 
+    new LinkedBlockingQueue<>();
+queue.put(newTask);
+Task task = queue.take();
+                                                    </code></pre>
+                                                    <p>Thread-safe queue with blocking operations</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

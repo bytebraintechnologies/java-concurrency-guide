@@ -11,119 +11,242 @@
 <body class="antialiased">
     <div class="page">
         <div class="page-wrapper">
-            <div class="page-header">
+            <div class="page-header d-print-none">
                 <div class="container-xl">
-                    <h1 class="page-title">Thread Pools in Java</h1>
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="index.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Home
+                            </a>
+                            <h1 class="page-title mt-3">Thread Pools in Java</h1>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
             <div class="page-body">
                 <div class="container-xl">
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
-                                    <h2>1. Fixed Thread Pool</h2>
-                                    <div class="code-section">
-                                        <pre><code class="language-java">
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+                                    <h2>1. Understanding Thread Pools</h2>
+                                    
+                                    <div class="mb-3">
+                                        <h3>Pseudocode: Thread Pool Concept</h3>
+                                        <pre><code class="language-text">
+// Pseudocode for Thread Pool Management
 
-public class FixedThreadPoolExample {
-    public static void main(String[] args) {
-        // Create a thread pool with 5 threads
-        ExecutorService executor = Executors.newFixedThreadPool(5);
+class ThreadPool:
+    max_threads = configure_max_threads()
+    task_queue = create_concurrent_queue()
+    active_threads = []
+    
+    function submit_task(task):
+        if len(active_threads) < max_threads:
+            create_new_worker_thread()
         
-        // Submit tasks to the thread pool
-        for (int i = 0; i < 10; i++) {
-            final int taskId = i;
-            executor.submit(() -> {
-                System.out.println("Task " + taskId + 
-                    " executed by " + Thread.currentThread().getName());
-            });
-        }
+        add_task_to_queue(task)
+    
+    function create_worker_thread():
+        thread = new Thread():
+            while true:
+                task = take_task_from_queue()
+                if task is not null:
+                    execute_task(task)
+                else:
+                    wait_or_terminate()
         
-        // Shutdown the executor
-        executor.shutdown();
-    }
-}
+        start_thread(thread)
+        add_to_active_threads(thread)
                                         </code></pre>
+                                    </div>
+                                    
+                                    <div class="alert alert-important" role="alert">
+                                        <h4>Key Thread Pool Principles</h4>
+                                        <ul>
+                                            <li>Reuse threads instead of creating new ones for each task</li>
+                                            <li>Limit maximum number of concurrent threads</li>
+                                            <li>Manage thread lifecycle efficiently</li>
+                                            <li>Improve application performance and resource utilization</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="card">
+                            <div class="card mt-4">
                                 <div class="card-body">
-                                    <h2>2. Cached Thread Pool</h2>
-                                    <div class="code-section">
+                                    <h2>2. Real-World Scenario: Web Server Request Processing</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Problem Scenario</h3>
+                                            <ul>
+                                                <li>Multiple concurrent web requests</li>
+                                                <li>Limited server resources</li>
+                                                <li>Need to handle requests efficiently</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Thread Pool Solution</h3>
+                                            <ul>
+                                                <li>Use fixed thread pool for request handling</li>
+                                                <li>Limit maximum concurrent connections</li>
+                                                <li>Prevent resource exhaustion</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section mt-3">
                                         <pre><code class="language-java">
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
-public class CachedThreadPoolExample {
-    public static void main(String[] args) {
-        // Create a cached thread pool that creates new threads as needed
-        ExecutorService executor = Executors.newCachedThreadPool();
+// Simulated Web Request Handler
+class WebRequestHandler implements Callable<String> {
+    private String requestId;
+    
+    public WebRequestHandler(String requestId) {
+        this.requestId = requestId;
+    }
+    
+    @Override
+    public String call() throws Exception {
+        // Simulate request processing
+        return processRequest(requestId);
+    }
+    
+    private String processRequest(String requestId) throws InterruptedException {
+        // Simulate variable processing time
+        int processingTime = (int) (Math.random() * 1000);
+        Thread.sleep(processingTime);
         
-        // Submit tasks to the thread pool
-        for (int i = 0; i < 10; i++) {
-            final int taskId = i;
-            executor.submit(() -> {
-                System.out.println("Task " + taskId + 
-                    " executed by " + Thread.currentThread().getName());
-                try {
-                    Thread.sleep(100); // Simulate some work
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            });
-        }
-        
-        // Shutdown the executor
-        executor.shutdown();
+        return "Response for request " + requestId + 
+               " (processed in " + processingTime + "ms)";
     }
 }
-                                        </code></pre>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="card">
-                                <div class="card-body">
-                                    <h2>3. Scheduled Thread Pool</h2>
-                                    <div class="code-section">
-                                        <pre><code class="language-java">
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-public class ScheduledThreadPoolExample {
+// Web Server Simulation with Thread Pool
+public class WebServerThreadPoolDemo {
     public static void main(String[] args) {
-        // Create a scheduled thread pool with 3 threads
-        ScheduledExecutorService scheduler = 
-            Executors.newScheduledThreadPool(3);
+        // Create a fixed thread pool with 5 threads
+        ExecutorService threadPool = Executors.newFixedThreadPool(5);
         
-        // Schedule a task to run after 2 seconds
-        scheduler.schedule(() -> {
-            System.out.println("Delayed task executed");
-        }, 2, TimeUnit.SECONDS);
+        // List to collect future responses
+        List<Future<String>> responses = new ArrayList<>();
         
-        // Schedule a task to run every 5 seconds
-        scheduler.scheduleAtFixedRate(() -> {
-            System.out.println("Periodic task executed");
-        }, 0, 5, TimeUnit.SECONDS);
+        // Simulate 20 concurrent web requests
+        for (int i = 1; i <= 20; i++) {
+            WebRequestHandler requestHandler = 
+                new WebRequestHandler("REQ-" + i);
+            
+            // Submit request to thread pool
+            Future<String> future = threadPool.submit(requestHandler);
+            responses.add(future);
+        }
         
-        // Schedule a task with a fixed delay after previous task completes
-        scheduler.scheduleWithFixedDelay(() -> {
-            System.out.println("Task with fixed delay");
+        // Collect and print responses
+        for (Future<String> response : responses) {
             try {
-                Thread.sleep(2000); // Simulate long-running task
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                System.out.println(response.get());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }, 0, 3, TimeUnit.SECONDS);
+        }
+        
+        // Shutdown the thread pool
+        threadPool.shutdown();
+        
+        try {
+            // Wait for all tasks to complete
+            if (!threadPool.awaitTermination(5, TimeUnit.SECONDS)) {
+                threadPool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            threadPool.shutdownNow();
+        }
     }
 }
                                         </code></pre>
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <h3>Industry Impact</h3>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h4>Where Used</h4>
+                                                <ul>
+                                                    <li>Web Servers (Tomcat, Jetty)</li>
+                                                    <li>Application Servers</li>
+                                                    <li>High-Concurrency Systems</li>
+                                                    <li>Microservice Architectures</li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h4>Benefits</h4>
+                                                <ul>
+                                                    <li>Controlled Resource Utilization</li>
+                                                    <li>Improved Performance</li>
+                                                    <li>Efficient Request Handling</li>
+                                                    <li>Predictable System Behavior</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Advanced Thread Pool Types</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h3>Fixed Thread Pool</h3>
+                                                    <pre><code class="language-java">
+// Constant number of threads
+ExecutorService fixedPool = 
+    Executors.newFixedThreadPool(5);
+                                                    </code></pre>
+                                                    <p>Best for controlled, predictable workloads</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h3>Cached Thread Pool</h3>
+                                                    <pre><code class="language-java">
+// Dynamically creates threads
+ExecutorService cachedPool = 
+    Executors.newCachedThreadPool();
+                                                    </code></pre>
+                                                    <p>Ideal for many short-lived tasks</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h3>Scheduled Thread Pool</h3>
+                                                    <pre><code class="language-java">
+// Supports scheduled and periodic tasks
+ScheduledExecutorService scheduledPool = 
+    Executors.newScheduledThreadPool(3);
+                                                    </code></pre>
+                                                    <p>Perfect for recurring background jobs</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
