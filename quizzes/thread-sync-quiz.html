@@ -210,37 +210,52 @@
             const questionCards = document.querySelectorAll('.question-card');
             let numCorrect = 0;
 
-            quizData.forEach((question, questionIndex) => {
-                const questionCard = questionCards[questionIndex];
-                const selector = `input[name=question${questionIndex}]:checked`;
-                const userAnswer = (questionCard.querySelector(selector) || {}).value;
-                const explanation = document.getElementById(`explanation${questionIndex}`);
+            questionData = [];
+            questionCards.forEach((card, index) => {
+                const questionText = card.querySelector('.question-content p').textContent;
+                const matchingQuestion = quizData.find(q => q.question === questionText);
+                if (matchingQuestion) {
+                    questionData.push({
+                        index: index,
+                        correctAnswer: matchingQuestion.correctAnswer,
+                        explanation: matchingQuestion.explanation
+                    });
+                }
+            });
+
+            questionCards.forEach((card, index) => {
+                const questionInfo = questionData[index];
+                const selector = `input[name=question${index}]:checked`;
+                const selectedInput = card.querySelector(selector);
+                const userAnswer = selectedInput ? selectedInput.value : null;
+                const explanation = document.getElementById(`explanation${index}`);
                 
                 // Show the explanation
                 if (explanation) {
                     explanation.style.display = 'block';
                 }
 
-                if (userAnswer === question.correctAnswer) {
+                if (userAnswer === questionInfo.correctAnswer) {
                     numCorrect++;
-                    questionCard.classList.add('correct');
+                    card.classList.add('correct');
                     
                     // Mark the correct option
-                    const options = questionCard.querySelectorAll('.option-label');
+                    const options = card.querySelectorAll('.option-label');
                     options.forEach(option => {
-                        if (option.textContent.trim() === question.correctAnswer) {
+                        if (option.innerText.trim() === questionInfo.correctAnswer) {
                             option.classList.add('correct');
                         }
                     });
                 } else {
-                    questionCard.classList.add('incorrect');
+                    card.classList.add('incorrect');
                     
                     // Mark incorrect and correct options
-                    const options = questionCard.querySelectorAll('.option-label');
+                    const options = card.querySelectorAll('.option-label');
                     options.forEach(option => {
-                        if (option.textContent.trim() === userAnswer) {
+                        const optionText = option.innerText.trim();
+                        if (optionText === userAnswer) {
                             option.classList.add('incorrect');
-                        } else if (option.textContent.trim() === question.correctAnswer) {
+                        } else if (optionText === questionInfo.correctAnswer) {
                             option.classList.add('correct');
                         }
                     });
@@ -248,7 +263,7 @@
             });
 
             // Display score
-            const percentage = Math.round((numCorrect / quizData.length) * 100);
+            const percentage = Math.round((numCorrect / questionCards.length) * 100);
             scoreDisplay.textContent = `${percentage}%`;
             
             // Customize score message based on performance

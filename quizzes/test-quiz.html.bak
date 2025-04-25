@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Quiz</title>
+    <style>
+        .option-label.correct {
+            background-color: rgba(47, 179, 68, 0.1);
+            border: 2px solid #2fb344;
+            padding: 5px;
+            margin: 5px;
+            display: block;
+        }
+        .option-label.incorrect {
+            background-color: rgba(214, 57, 57, 0.1);
+            border: 2px solid #d63939;
+            padding: 5px;
+            margin: 5px;
+            display: block;
+        }
+        .option-label {
+            border: 1px solid #ccc;
+            padding: 5px;
+            margin: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <h1>Test Quiz</h1>
+        <div id="options-container">
+            <!-- Options will be dynamically added here -->
+        </div>
+        <div>
+            <button id="test-button">Test Option Marking</button>
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Test data
+        const correctAnswer = "This is the correct answer";
+        const userAnswer = "This is the selected answer";
+        
+        // Setup options
+        const optionsContainer = document.getElementById('options-container');
+        const options = [
+            "Option 1",
+            correctAnswer,
+            userAnswer,
+            "Option 4"
+        ];
+        
+        // Create option labels
+        options.forEach((option, index) => {
+            const label = document.createElement('label');
+            label.className = 'option-label';
+            label.innerHTML = option;
+            label.setAttribute('data-value', option);
+            optionsContainer.appendChild(label);
+        });
+        
+        // Test button logic
+        document.getElementById('test-button').addEventListener('click', function() {
+            const resultDiv = document.getElementById('results');
+            resultDiv.innerHTML = '';
+            
+            // Log the options and their trimmed content for debugging
+            const optionLabels = document.querySelectorAll('.option-label');
+            optionLabels.forEach(option => {
+                console.log(`Label text: "${option.textContent}", Trimmed: "${option.textContent.trim()}"`);
+                resultDiv.innerHTML += `Label text: "${option.textContent}", Trimmed: "${option.textContent.trim()}"<br>`;
+            });
+            
+            // Mark correct and incorrect options
+            optionLabels.forEach(option => {
+                if (option.textContent.trim() === correctAnswer) {
+                    option.classList.add('correct');
+                    resultDiv.innerHTML += `Marked as CORRECT: "${option.textContent.trim()}"<br>`;
+                } else if (option.textContent.trim() === userAnswer) {
+                    option.classList.add('incorrect');
+                    resultDiv.innerHTML += `Marked as INCORRECT: "${option.textContent.trim()}"<br>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
