@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executor Framework - Technical Explanation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="executor-framework.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Executor Framework
+                            </a>
+                            <h1 class="page-title mt-3">Technical Explanation of Executor Framework</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Basic Executor Interface</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Core Concept:</strong> Decouple task submission from execution</li>
+                                                <li><strong>Key Methods:</strong>
+                                                    <ul>
+                                                        <li>execute(): Run a Runnable task</li>
+                                                        <li>submit(): Submit a task with return value</li>
+                                                        <li>shutdown(): Graceful executor termination</li>
+                                                    </ul>
+                                                </li>
+                                                <li><strong>Design Pattern:</strong> Command pattern implementation</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="executor-interface-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public interface Executor {
+    // Execute a Runnable task
+    void execute(Runnable command);
+}
+
+public interface ExecutorService extends Executor {
+    // Submit a task with potential return value
+    <T> Future<T> submit(Callable<T> task);
+    
+    // Shutdown the executor
+    void shutdown();
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Callable and Future Mechanisms</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Callable:</strong> Task that returns a value</li>
+                                                <li><strong>Future:</strong> Represents pending task result</li>
+                                                <li><strong>Key Methods:</strong>
+                                                    <ul>
+                                                        <li>get(): Retrieve task result</li>
+                                                        <li>isDone(): Check task completion</li>
+                                                        <li>cancel(): Attempt to cancel task</li>
+                                                    </ul>
+                                                </li>
+                                                <li><strong>Synchronization:</strong> Blocks until result available</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="callable-future-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public interface Callable<V> {
+    // Task with a return value
+    V call() throws Exception;
+}
+
+public interface Future<V> {
+    // Get the result of the task
+    V get() throws InterruptedException, ExecutionException;
+    
+    // Check if task is complete
+    boolean isDone();
+    
+    // Attempt to cancel the task
+    boolean cancel(boolean mayInterruptIfRunning);
+}
+
+// Example usage
+ExecutorService executor = Executors.newFixedThreadPool(4);
+Future<Integer> future = executor.submit(() -> {
+    // Perform computation
+    return calculateResult();
+});
+
+// Wait for and retrieve result
+Integer result = future.get();
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Advanced Execution Techniques</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>invokeAll():</strong> Execute multiple tasks simultaneously</li>
+                                                <li><strong>invokeAny():</strong> Execute tasks, return first completed result</li>
+                                                <li><strong>Timeout Handling:</strong> Prevent indefinite waiting</li>
+                                                <li><strong>Error Management:</strong> Centralized exception handling</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="advanced-execution-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class AdvancedExecutionTechniques {
+    public void demonstrateAdvancedMethods() throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        
+        // Execute multiple tasks and wait for all results
+        List<Callable<Integer>> tasks = Arrays.asList(
+            () -> calculateTask(1),
+            () -> calculateTask(2),
+            () -> calculateTask(3)
+        );
+        
+        // Wait for all tasks to complete
+        List<Future<Integer>> results = executor.invokeAll(tasks);
+        
+        // Execute tasks, return first completed result
+        Integer firstResult = executor.invokeAny(tasks);
+        
+        // Execute with timeout
+        try {
+            Integer timeoutResult = executor.invokeAny(
+                tasks, 2, TimeUnit.SECONDS
+            );
+        } catch (TimeoutException e) {
+            // Handle timeout scenario
+        }
+        
+        executor.shutdown();
+    }
+    
+    private int calculateTask(int input) {
+        // Simulate task computation
+        return input * input;
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    
+    <script>
+        function createDiagram(containerId, svgContent) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = svgContent;
+            }
+        }
+
+        // Executor Interface Diagram
+        createDiagram('executor-interface-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Executor Interface</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Task Submission Decoupling
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Separation of Concerns
+                </text>
+            </svg>
+        `);
+
+        // Callable and Future Diagram
+        createDiagram('callable-future-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Callable and Future</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Asynchronous Result Handling
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Non-Blocking Computation
+                </text>
+            </svg>
+        `);
+
+        // Advanced Execution Diagram
+        createDiagram('advanced-execution-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Advanced Execution</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Parallel Task Management
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Flexible Execution Strategies
+                </text>
+            </svg>
+        `);
+    </script>
+</body>
+</html>

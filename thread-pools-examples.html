@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Pools - Real-World Examples</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="thread-pools.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Thread Pools
+                            </a>
+                            <h1 class="page-title mt-3">Real-World Thread Pools Scenarios</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Web Server Request Processing</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in high-traffic web applications</li>
+                                                <li>Manage concurrent client requests</li>
+                                                <li>Prevent resource exhaustion</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Limited thread pool for request handling</li>
+                                                <li>Concurrent client request processing</li>
+                                                <li>Efficient resource utilization</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class WebServerRequestProcessor {
+    // Create a fixed thread pool for handling requests
+    private final ExecutorService requestExecutor = 
+        Executors.newFixedThreadPool(10);
+    
+    public void handleClientRequest(ClientRequest request) {
+        requestExecutor.submit(() -> {
+            try {
+                // Process the client request
+                processRequest(request);
+            } catch (Exception e) {
+                handleRequestError(request, e);
+            }
+        });
+    }
+    
+    private void processRequest(ClientRequest request) {
+        // Simulate request processing
+        System.out.println("Processing request: " + request);
+        try {
+            // Simulate variable processing time
+            Thread.sleep((long) (Math.random() * 1000));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+    
+    private void handleRequestError(ClientRequest request, Exception e) {
+        System.err.println("Error processing request: " + request);
+        e.printStackTrace();
+    }
+    
+    // Client request model
+    public static class ClientRequest {
+        private String clientId;
+        private String requestData;
+        
+        public ClientRequest(String clientId, String requestData) {
+            this.clientId = clientId;
+            this.requestData = requestData;
+        }
+        
+        @Override
+        public String toString() {
+            return "ClientRequest{" +
+                   "clientId='" + clientId + '\'' +
+                   ", requestData='" + requestData + '\'' +
+                   '}';
+        }
+    }
+    
+    // Demonstration method
+    public static void main(String[] args) {
+        WebServerRequestProcessor server = 
+            new WebServerRequestProcessor();
+        
+        // Simulate multiple client requests
+        for (int i = 1; i <= 20; i++) {
+            ClientRequest request = new ClientRequest(
+                "Client-" + i, 
+                "Request-Data-" + i
+            );
+            server.handleClientRequest(request);
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Image Processing Pipeline</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in photo editing and batch processing</li>
+                                                <li>Parallel image transformation</li>
+                                                <li>Optimize computational resources</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Concurrent image processing</li>
+                                                <li>Utilize multiple CPU cores</li>
+                                                <li>Efficient batch image transformation</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class ImageProcessingPipeline {
+    // Create a cached thread pool for image processing
+    private final ExecutorService imageProcessorExecutor = 
+        Executors.newCachedThreadPool();
+    
+    public void processImages(List<BufferedImage> images) {
+        List<Future<BufferedImage>> processedImageFutures = new ArrayList<>();
+        
+        // Submit image processing tasks
+        for (BufferedImage image : images) {
+            Future<BufferedImage> processedImage = 
+                imageProcessorExecutor.submit(() -> {
+                    return applyImageFilters(image);
+                });
+            processedImageFutures.add(processedImage);
+        }
+        
+        // Collect processed images
+        List<BufferedImage> processedImages = new ArrayList<>();
+        for (Future<BufferedImage> future : processedImageFutures) {
+            try {
+                processedImages.add(future.get());
+            } catch (Exception e) {
+                System.err.println("Image processing error: " + e.getMessage());
+            }
+        }
+    }
+    
+    private BufferedImage applyImageFilters(BufferedImage image) {
+        // Simulate complex image processing
+        BufferedImage processedImage = new BufferedImage(
+            image.getWidth(), image.getHeight(), 
+            BufferedImage.TYPE_INT_RGB
+        );
+        
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                int rgb = image.getRGB(x, y);
+                int processedRgb = processPixel(rgb);
+                processedImage.setRGB(x, y, processedRgb);
+            }
+        }
+        
+        return processedImage;
+    }
+    
+    private int processPixel(int rgb) {
+        // Simulate image processing (e.g., grayscale conversion)
+        int r = (rgb >> 16) & 0xFF;
+        int g = (rgb >> 8) & 0xFF;
+        int b = rgb & 0xFF;
+        
+        int grayValue = (r + g + b) / 3;
+        return (grayValue << 16) | (grayValue << 8) | grayValue;
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Periodic Monitoring System</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in system monitoring and logging</li>
+                                                <li>Scheduled background tasks</li>
+                                                <li>Resource health tracking</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Periodic system health checks</li>
+                                                <li>Scheduled logging and reporting</li>
+                                                <li>Background maintenance tasks</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class SystemMonitoringScheduler {
+    // Create a scheduled thread pool for monitoring tasks
+    private final ScheduledExecutorService monitoringScheduler = 
+        Executors.newScheduledThreadPool(3);
+    
+    public void startMonitoring() {
+        // Periodic system health check every 5 minutes
+        monitoringScheduler.scheduleAtFixedRate(
+            this::checkSystemHealth, 
+            0, 5, TimeUnit.MINUTES
+        );
+        
+        // Delayed log rotation task
+        monitoringScheduler.schedule(
+            this::rotateSystemLogs, 
+            1, TimeUnit.HOURS
+        );
+        
+        // Periodic resource cleanup
+        monitoringScheduler.scheduleWithFixedDelay(
+            this::performResourceCleanup, 
+            0, 30, TimeUnit.MINUTES
+        );
+    }
+    
+    private void checkSystemHealth() {
+        System.out.println("Performing system health check");
+        // Check CPU usage, memory, disk space, etc.
+        double cpuUsage = getCurrentCpuUsage();
+        long availableMemory = getAvailableMemory();
+        
+        // Log or trigger alerts based on health metrics
+        if (cpuUsage > 80 || availableMemory < 1024) {
+            triggerAlert(cpuUsage, availableMemory);
+        }
+    }
+    
+    private void rotateSystemLogs() {
+        System.out.println("Rotating system logs");
+        // Implement log rotation logic
+        // Move current logs to archive, create new log files
+    }
+    
+    private void performResourceCleanup() {
+        System.out.println("Performing resource cleanup");
+        // Remove temporary files
+        // Clear caches
+        // Release unused resources
+    }
+    
+    // Simulated methods for demonstration
+    private double getCurrentCpuUsage() {
+        return Math.random() * 100;
+    }
+    
+    private long getAvailableMemory() {
+        return (long) (Math.random() * 4096);
+    }
+    
+    private void triggerAlert(double cpuUsage, long memory) {
+        System.out.println("ALERT: High resource usage");
+        System.out.println("CPU Usage: " + cpuUsage + "%");
+        System.out.println("Available Memory: " + memory + "MB");
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

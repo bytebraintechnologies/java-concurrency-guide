@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Communication - Real-World Examples</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="thread-comm.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Thread Communication
+                            </a>
+                            <h1 class="page-title mt-3">Real-World Thread Communication Scenarios</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Print Job Management System</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in office printing infrastructure</li>
+                                                <li>Manage concurrent print job submissions</li>
+                                                <li>Prevent print queue conflicts</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Multiple users submitting print jobs</li>
+                                                <li>Limited printer resources</li>
+                                                <li>Thread-safe print queue management</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+public class PrintJobManagementSystem {
+    // Thread-safe print job queue
+    private BlockingQueue<PrintJob> printQueue;
+    
+    public PrintJobManagementSystem(int queueCapacity) {
+        this.printQueue = new LinkedBlockingQueue<>(queueCapacity);
+    }
+    
+    // Print job submission method
+    public void submitPrintJob(PrintJob job) throws InterruptedException {
+        // Blocks if queue is full
+        printQueue.put(job);
+        System.out.println("Job Submitted: " + job);
+    }
+    
+    // Printer worker thread
+    public void startPrinterWorker() {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    // Blocks and waits if no jobs are available
+                    PrintJob job = printQueue.take();
+                    processPrintJob(job);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+        }).start();
+    }
+    
+    private void processPrintJob(PrintJob job) {
+        // Simulate print processing
+        System.out.println("Processing: " + job);
+        try {
+            // Simulate printing time based on pages
+            Thread.sleep(job.getPages() * 100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        System.out.println("Completed: " + job);
+    }
+    
+    // Print Job Model
+    public static class PrintJob {
+        private String documentName;
+        private int pages;
+        
+        public PrintJob(String documentName, int pages) {
+            this.documentName = documentName;
+            this.pages = pages;
+        }
+        
+        public int getPages() { return pages; }
+        
+        @Override
+        public String toString() {
+            return documentName + " (" + pages + " pages)";
+        }
+    }
+    
+    // Demonstration method
+    public static void main(String[] args) throws InterruptedException {
+        PrintJobManagementSystem printerSystem = 
+            new PrintJobManagementSystem(5);
+        
+        // Start printer worker
+        printerSystem.startPrinterWorker();
+        
+        // Simulate multiple users submitting print jobs
+        new Thread(() -> {
+            try {
+                printerSystem.submitPrintJob(
+                    new PrintJob("Report.docx", 10)
+                );
+                printerSystem.submitPrintJob(
+                    new PrintJob("Presentation.pptx", 20)
+                );
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }).start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Trading Platform Order Processing</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in financial trading systems</li>
+                                                <li>Coordinate order submission and execution</li>
+                                                <li>Prevent race conditions in trading</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Multiple traders submitting orders</li>
+                                                <li>Synchronized order processing</li>
+                                                <li>Thread-safe order management</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class TradingPlatformOrderSystem {
+    private final Lock orderLock = new ReentrantLock();
+    private final Condition orderAvailable = orderLock.newCondition();
+    private volatile boolean isOrderProcessing = false;
+    
+    public void submitOrder(TradeOrder order) throws InterruptedException {
+        orderLock.lock();
+        try {
+            // Wait if another order is being processed
+            while (isOrderProcessing) {
+                orderAvailable.await();
+            }
+            
+            // Process the order
+            processOrder(order);
+            
+            // Signal that order processing is complete
+            isOrderProcessing = false;
+            orderAvailable.signal();
+        } finally {
+            orderLock.unlock();
+        }
+    }
+    
+    private void processOrder(TradeOrder order) {
+        System.out.println("Processing Order: " + order);
+        try {
+            // Simulate order processing time
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+    
+    // Trade Order Model
+    public static class TradeOrder {
+        private String symbol;
+        private int quantity;
+        private double price;
+        
+        public TradeOrder(String symbol, int quantity, double price) {
+            this.symbol = symbol;
+            this.quantity = quantity;
+            this.price = price;
+        }
+        
+        @Override
+        public String toString() {
+            return "Order{" +
+                   "symbol='" + symbol + '\'' +
+                   ", quantity=" + quantity +
+                   ", price=" + price +
+                   '}';
+        }
+    }
+    
+    // Demonstration method
+    public static void main(String[] args) {
+        TradingPlatformOrderSystem tradingSystem = 
+            new TradingPlatformOrderSystem();
+        
+        // Simulate multiple traders
+        Runnable traderTask = () -> {
+            try {
+                tradingSystem.submitOrder(
+                    new TradeOrder("AAPL", 100, 150.50)
+                );
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        };
+        
+        // Create multiple trader threads
+        new Thread(traderTask, "Trader-1").start();
+        new Thread(traderTask, "Trader-2").start();
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Distributed Task Scheduler</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in distributed computing systems</li>
+                                                <li>Coordinate task distribution</li>
+                                                <li>Manage concurrent task execution</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Multiple workers processing tasks</li>
+                                                <li>Synchronized task queue</li>
+                                                <li>Load balancing mechanism</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+
+public class DistributedTaskScheduler {
+    private final BlockingQueue<Task> taskQueue;
+    private final int workerCount;
+    
+    public DistributedTaskScheduler(int queueCapacity, int workerCount) {
+        this.taskQueue = new LinkedBlockingQueue<>(queueCapacity);
+        this.workerCount = workerCount;
+    }
+    
+    // Submit task to the queue
+    public void submitTask(Task task) throws InterruptedException {
+        taskQueue.put(task);
+    }
+    
+    // Start worker threads
+    public void startWorkers() {
+        for (int i = 0; i < workerCount; i++) {
+            new Thread(new Worker(), "Worker-" + (i + 1)).start();
+        }
+    }
+    
+    // Worker thread implementation
+    private class Worker implements Runnable {
+        @Override
+        public void run() {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    // Take task from queue, wait if empty
+                    Task task = taskQueue.take();
+                    processTask(task);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+        
+        private void processTask(Task task) {
+            System.out.println(
+                Thread.currentThread().getName() + 
+                " processing: " + task
+            );
+            try {
+                // Simulate task processing
+                Thread.sleep(task.getProcessingTime());
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+    
+    // Task Model
+    public static class Task {
+        private String name;
+        private long processingTime;
+        
+        public Task(String name, long processingTime) {
+            this.name = name;
+            this.processingTime = processingTime;
+        }
+        
+        public long getProcessingTime() { return processingTime; }
+        
+        @Override
+        public String toString() {
+            return "Task{name='" + name + "'}";
+        }
+    }
+    
+    // Demonstration method
+    public static void main(String[] args) throws InterruptedException {
+        DistributedTaskScheduler scheduler = 
+            new DistributedTaskScheduler(10, 3);
+        
+        // Start worker threads
+        scheduler.startWorkers();
+        
+        // Submit tasks
+        scheduler.submitTask(new Task("Task-1", 1000));
+        scheduler.submitTask(new Task("Task-2", 500));
+        scheduler.submitTask(new Task("Task-3", 750));
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

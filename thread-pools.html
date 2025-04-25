@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thread Pools - Java Multithreading</title>
+    <title>Thread Pools in Java</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="antialiased">
@@ -32,222 +31,43 @@
             
             <div class="page-body">
                 <div class="container-xl">
-                    <div class="row">
-                        <div class="col-12">
+                    <div class="row row-cards">
+                        <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body">
-                                    <h2>1. Understanding Thread Pools</h2>
-                                    
-                                    <div class="mb-3">
-                                        <h3>Pseudocode: Thread Pool Concept</h3>
-                                        <pre><code class="language-text">
-// Pseudocode for Thread Pool Management
-
-class ThreadPool:
-    max_threads = configure_max_threads()
-    task_queue = create_concurrent_queue()
-    active_threads = []
-    
-    function submit_task(task):
-        if len(active_threads) < max_threads:
-            create_new_worker_thread()
-        
-        add_task_to_queue(task)
-    
-    function create_worker_thread():
-        thread = new Thread():
-            while true:
-                task = take_task_from_queue()
-                if task is not null:
-                    execute_task(task)
-                else:
-                    wait_or_terminate()
-        
-        start_thread(thread)
-        add_to_active_threads(thread)
-                                        </code></pre>
-                                    </div>
-                                    
-                                    <div class="alert alert-important" role="alert">
-                                        <h4>Key Thread Pool Principles</h4>
-                                        <ul>
-                                            <li>Reuse threads instead of creating new ones for each task</li>
-                                            <li>Limit maximum number of concurrent threads</li>
-                                            <li>Manage thread lifecycle efficiently</li>
-                                            <li>Improve application performance and resource utilization</li>
-                                        </ul>
-                                    </div>
+                                    <h2 class="card-title">Technical Explanation</h2>
+                                    <p>Dive deep into the technical mechanisms of thread pools</p>
+                                    <a href="thread-pools-technical.html" class="btn btn-primary">Explore Technical Details</a>
                                 </div>
                             </div>
-                            
-                            <div class="card mt-4">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
                                 <div class="card-body">
-                                    <h2>2. Real-World Scenario: Web Server Request Processing</h2>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h3>Problem Scenario</h3>
-                                            <ul>
-                                                <li>Multiple concurrent web requests</li>
-                                                <li>Limited server resources</li>
-                                                <li>Need to handle requests efficiently</li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h3>Thread Pool Solution</h3>
-                                            <ul>
-                                                <li>Use fixed thread pool for request handling</li>
-                                                <li>Limit maximum concurrent connections</li>
-                                                <li>Prevent resource exhaustion</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="code-section mt-3">
-                                        <pre><code class="language-java">
-import java.util.concurrent.*;
-
-// Simulated Web Request Handler
-class WebRequestHandler implements Callable<String> {
-    private String requestId;
-    
-    public WebRequestHandler(String requestId) {
-        this.requestId = requestId;
-    }
-    
-    @Override
-    public String call() throws Exception {
-        // Simulate request processing
-        return processRequest(requestId);
-    }
-    
-    private String processRequest(String requestId) throws InterruptedException {
-        // Simulate variable processing time
-        int processingTime = (int) (Math.random() * 1000);
-        Thread.sleep(processingTime);
-        
-        return "Response for request " + requestId + 
-               " (processed in " + processingTime + "ms)";
-    }
-}
-
-// Web Server Simulation with Thread Pool
-public class WebServerThreadPoolDemo {
-    public static void main(String[] args) {
-        // Create a fixed thread pool with 5 threads
-        ExecutorService threadPool = Executors.newFixedThreadPool(5);
-        
-        // List to collect future responses
-        List<Future<String>> responses = new ArrayList<>();
-        
-        // Simulate 20 concurrent web requests
-        for (int i = 1; i <= 20; i++) {
-            WebRequestHandler requestHandler = 
-                new WebRequestHandler("REQ-" + i);
-            
-            // Submit request to thread pool
-            Future<String> future = threadPool.submit(requestHandler);
-            responses.add(future);
-        }
-        
-        // Collect and print responses
-        for (Future<String> response : responses) {
-            try {
-                System.out.println(response.get());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        
-        // Shutdown the thread pool
-        threadPool.shutdown();
-        
-        try {
-            // Wait for all tasks to complete
-            if (!threadPool.awaitTermination(5, TimeUnit.SECONDS)) {
-                threadPool.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            threadPool.shutdownNow();
-        }
-    }
-}
-                                        </code></pre>
-                                    </div>
-                                    
-                                    <div class="mt-3">
-                                        <h3>Industry Impact</h3>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h4>Where Used</h4>
-                                                <ul>
-                                                    <li>Web Servers (Tomcat, Jetty)</li>
-                                                    <li>Application Servers</li>
-                                                    <li>High-Concurrency Systems</li>
-                                                    <li>Microservice Architectures</li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <h4>Benefits</h4>
-                                                <ul>
-                                                    <li>Controlled Resource Utilization</li>
-                                                    <li>Improved Performance</li>
-                                                    <li>Efficient Request Handling</li>
-                                                    <li>Predictable System Behavior</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <h2 class="card-title">Real-World Examples</h2>
+                                    <p>Understand thread pools through practical, industry-relevant scenarios</p>
+                                    <a href="thread-pools-examples.html" class="btn btn-primary">View Examples</a>
                                 </div>
                             </div>
-                            
-                            <div class="card mt-4">
-                                <div class="card-body">
-                                    <h2>3. Advanced Thread Pool Types</h2>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h3>Fixed Thread Pool</h3>
-                                                    <pre><code class="language-java">
-// Constant number of threads
-ExecutorService fixedPool = 
-    Executors.newFixedThreadPool(5);
-                                                    </code></pre>
-                                                    <p>Best for controlled, predictable workloads</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="col-md-4">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h3>Cached Thread Pool</h3>
-                                                    <pre><code class="language-java">
-// Dynamically creates threads
-ExecutorService cachedPool = 
-    Executors.newCachedThreadPool();
-                                                    </code></pre>
-                                                    <p>Ideal for many short-lived tasks</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="col-md-4">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h3>Scheduled Thread Pool</h3>
-                                                    <pre><code class="language-java">
-// Supports scheduled and periodic tasks
-ScheduledExecutorService scheduledPool = 
-    Executors.newScheduledThreadPool(3);
-                                                    </code></pre>
-                                                    <p>Perfect for recurring background jobs</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h2>Thread Pools Overview</h2>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h3>1. Fixed Thread Pool</h3>
+                                    <p>Maintain a constant number of threads</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h3>2. Cached Thread Pool</h3>
+                                    <p>Create threads as needed, reuse existing threads</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h3>3. Scheduled Thread Pool</h3>
+                                    <p>Support scheduled and periodic tasks</p>
                                 </div>
                             </div>
                         </div>
@@ -258,7 +78,5 @@ ScheduledExecutorService scheduledPool =
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
 </body>
 </html>

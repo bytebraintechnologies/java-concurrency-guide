@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thread Pools - Technical Explanation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="thread-pools.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Thread Pools
+                            </a>
+                            <h1 class="page-title mt-3">Technical Explanation of Thread Pools</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Fixed Thread Pool</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Predefined number of threads</li>
+                                                <li><strong>Thread Reuse:</strong> Threads are reused for multiple tasks</li>
+                                                <li><strong>Queue Management:</strong> Tasks wait in a queue if all threads are busy</li>
+                                                <li><strong>Best For:</strong> Predictable, consistent workloads</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="fixed-thread-pool-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+// Create a fixed thread pool with 5 threads
+ExecutorService executor = Executors.newFixedThreadPool(5);
+
+// Submit tasks to the thread pool
+for (int i = 0; i < 10; i++) {
+    final int taskId = i;
+    executor.submit(() -> {
+        System.out.println("Task " + taskId + 
+            " executed by " + Thread.currentThread().getName());
+    });
+}
+
+// Shutdown the executor when done
+executor.shutdown();
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Cached Thread Pool</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Dynamically create and reuse threads</li>
+                                                <li><strong>Scalability:</strong> Grows and shrinks based on demand</li>
+                                                <li><strong>Thread Lifecycle:</strong> Idle threads kept alive for reuse</li>
+                                                <li><strong>Best For:</strong> Many short-lived, asynchronous tasks</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="cached-thread-pool-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+// Create a cached thread pool
+ExecutorService executor = Executors.newCachedThreadPool();
+
+// Submit multiple tasks
+for (int i = 0; i < 10; i++) {
+    final int taskId = i;
+    executor.submit(() -> {
+        System.out.println("Task " + taskId + 
+            " executed by " + Thread.currentThread().getName());
+        try {
+            Thread.sleep(100); // Simulate work
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    });
+}
+
+// Shutdown the executor
+executor.shutdown();
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Scheduled Thread Pool</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Technical Explanation</h3>
+                                            <ul>
+                                                <li><strong>Mechanism:</strong> Support for scheduled and periodic tasks</li>
+                                                <li><strong>Task Scheduling:</strong> Delayed and recurring executions</li>
+                                                <li><strong>Precision:</strong> Configurable thread count</li>
+                                                <li><strong>Best For:</strong> Background jobs, monitoring tasks</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="scheduled-thread-pool-diagram"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+// Create a scheduled thread pool with 3 threads
+ScheduledExecutorService scheduler = 
+    Executors.newScheduledThreadPool(3);
+
+// Schedule a task to run after 2 seconds
+scheduler.schedule(() -> {
+    System.out.println("Delayed task executed");
+}, 2, TimeUnit.SECONDS);
+
+// Schedule a task to run every 5 seconds
+scheduler.scheduleAtFixedRate(() -> {
+    System.out.println("Periodic task executed");
+}, 0, 5, TimeUnit.SECONDS);
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    
+    <script>
+        function createDiagram(containerId, svgContent) {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = svgContent;
+            }
+        }
+
+        // Fixed Thread Pool Diagram
+        createDiagram('fixed-thread-pool-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Fixed Thread Pool</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Constant Thread Count
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Predictable Resource Usage
+                </text>
+            </svg>
+        `);
+
+        // Cached Thread Pool Diagram
+        createDiagram('cached-thread-pool-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Cached Thread Pool</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Dynamic Thread Creation
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Flexible Resource Allocation
+                </text>
+            </svg>
+        `);
+
+        // Scheduled Thread Pool Diagram
+        createDiagram('scheduled-thread-pool-diagram', `
+            <svg viewBox="0 0 400 200" class="w-full" xmlns="http://www.w3.org/2000/svg">
+                <rect x="50" y="50" width="300" height="100" fill="#f0f0f0" stroke="#000" stroke-width="2" />
+                <text x="200" y="70" text-anchor="middle" font-weight="bold">Scheduled Thread Pool</text>
+                
+                <rect x="100" y="90" width="200" height="40" fill="#e0e0e0" stroke="#666" />
+                <text x="200" y="115" text-anchor="middle">
+                    Periodic Task Execution
+                </text>
+                
+                <path d="M200 130 L200 170" stroke="#000" stroke-width="2" stroke-dasharray="5,5" />
+                <text x="200" y="190" text-anchor="middle" font-size="12">
+                    Time-Based Task Management
+                </text>
+            </svg>
+        `);
+    </script>
+</body>
+</html>

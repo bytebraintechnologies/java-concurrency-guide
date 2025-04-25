@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executor Framework - Real-World Examples</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="antialiased">
+    <div class="page">
+        <div class="page-wrapper">
+            <div class="page-header d-print-none">
+                <div class="container-xl">
+                    <div class="row g-2 align-items-center">
+                        <div class="col">
+                            <a href="executor-framework.html" class="btn btn-outline-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M5 12l14 0" />
+                                    <path d="M5 12l6 6" />
+                                    <path d="M5 12l6 -6" />
+                                </svg>
+                                Back to Executor Framework
+                            </a>
+                            <h1 class="page-title mt-3">Real-World Executor Framework Scenarios</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-body">
+                <div class="container-xl">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2>1. Data Processing Pipeline</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in big data processing</li>
+                                                <li>Parallel data transformation</li>
+                                                <li>Efficient resource utilization</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Concurrent data processing</li>
+                                                <li>Aggregate and transform large datasets</li>
+                                                <li>Manage computational resources</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class DataProcessingPipeline {
+    public List<ProcessedData> processDataset(List<RawData> rawDataset) {
+        // Create an executor service
+        ExecutorService executor = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors()
+        );
+        
+        // Prepare processing tasks
+        List<Callable<ProcessedData>> processingTasks = rawDataset.stream()
+            .map(this::createProcessingTask)
+            .collect(Collectors.toList());
+        
+        try {
+            // Execute all tasks and collect results
+            List<Future<ProcessedData>> futures = executor.invokeAll(processingTasks);
+            
+            // Collect processed data
+            List<ProcessedData> processedDataset = new ArrayList<>();
+            for (Future<ProcessedData> future : futures) {
+                processedDataset.add(future.get());
+            }
+            
+            return processedDataset;
+        } catch (InterruptedException | ExecutionException e) {
+            // Handle exceptions
+            throw new RuntimeException("Data processing failed", e);
+        } finally {
+            // Shutdown the executor
+            executor.shutdown();
+        }
+    }
+    
+    private Callable<ProcessedData> createProcessingTask(RawData rawData) {
+        return () -> {
+            // Simulate complex data processing
+            return new ProcessedData(
+                rawData.getId(),
+                transformData(rawData.getValue()),
+                calculateComplexity(rawData)
+            );
+        };
+    }
+    
+    private String transformData(String input) {
+        // Simulate data transformation
+        return input.toUpperCase();
+    }
+    
+    private int calculateComplexity(RawData rawData) {
+        return rawData.getValue().length();
+    }
+    
+    // Data model classes
+    public static class RawData {
+        private String id;
+        private String value;
+        
+        public RawData(String id, String value) {
+            this.id = id;
+            this.value = value;
+        }
+        
+        public String getId() { return id; }
+        public String getValue() { return value; }
+    }
+    
+    public static class ProcessedData {
+        private String id;
+        private String processedValue;
+        private int complexity;
+        
+        public ProcessedData(String id, String processedValue, int complexity) {
+            this.id = id;
+            this.processedValue = processedValue;
+            this.complexity = complexity;
+        }
+        
+        @Override
+        public String toString() {
+            return "ProcessedData{" +
+                   "id='" + id + '\'' +
+                   ", processedValue='" + processedValue + '\'' +
+                   ", complexity=" + complexity +
+                   '}';
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>2. Web Crawler with Timeout</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in web scraping and indexing</li>
+                                                <li>Parallel URL processing</li>
+                                                <li>Prevent long-running tasks</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Concurrent URL fetching</li>
+                                                <li>Timeout management</li>
+                                                <li>Error handling for web requests</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class WebCrawler {
+    private final ExecutorService executor;
+    private final int timeoutSeconds;
+    
+    public WebCrawler(int threadCount, int timeoutSeconds) {
+        this.executor = Executors.newFixedThreadPool(threadCount);
+        this.timeoutSeconds = timeoutSeconds;
+    }
+    
+    public List<WebPage> crawlUrls(List<String> urls) {
+        // Prepare URL fetching tasks
+        List<Callable<WebPage>> crawlingTasks = urls.stream()
+            .map(this::createCrawlingTask)
+            .collect(Collectors.toList());
+        
+        List<WebPage> crawledPages = new ArrayList<>();
+        
+        try {
+            // Execute tasks with timeout
+            List<Future<WebPage>> futures = executor.invokeAll(
+                crawlingTasks, 
+                timeoutSeconds, 
+                TimeUnit.SECONDS
+            );
+            
+            // Collect successful crawl results
+            for (Future<WebPage> future : futures) {
+                try {
+                    if (future.isDone() && !future.isCancelled()) {
+                        crawledPages.add(future.get());
+                    }
+                } catch (ExecutionException e) {
+                    // Log or handle individual task failures
+                    System.err.println("Crawling failed: " + e.getMessage());
+                }
+            }
+            
+            return crawledPages;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Web crawling interrupted", e);
+        } finally {
+            executor.shutdown();
+        }
+    }
+    
+    private Callable<WebPage> createCrawlingTask(String url) {
+        return () -> {
+            try {
+                // Simulate URL fetching
+                return fetchWebPage(url);
+            } catch (Exception e) {
+                // Handle individual URL crawling errors
+                System.err.println("Error crawling " + url + ": " + e.getMessage());
+                throw e;
+            }
+        };
+    }
+    
+    private WebPage fetchWebPage(String url) throws Exception {
+        // Simulate web page fetching with potential delay
+        Thread.sleep((long) (Math.random() * 3000));
+        
+        return new WebPage(
+            url, 
+            "Content of " + url, 
+            System.currentTimeMillis()
+        );
+    }
+    
+    // Web Page model
+    public static class WebPage {
+        private String url;
+        private String content;
+        private long fetchTime;
+        
+        public WebPage(String url, String content, long fetchTime) {
+            this.url = url;
+            this.content = content;
+            this.fetchTime = fetchTime;
+        }
+        
+        @Override
+        public String toString() {
+            return "WebPage{" +
+                   "url='" + url + '\'' +
+                   ", contentLength=" + content.length() +
+                   ", fetchTime=" + fetchTime +
+                   '}';
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h2>3. Batch Image Processing</h2>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h3>Industry Context</h3>
+                                            <ul>
+                                                <li>Used in photo editing software</li>
+                                                <li>Parallel image transformation</li>
+                                                <li>Efficient resource utilization</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Scenario Details</h3>
+                                            <ul>
+                                                <li>Concurrent image processing</li>
+                                                <li>Aggregate processing results</li>
+                                                <li>Handle processing errors</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="code-section">
+                                        <pre><code class="language-java">
+public class BatchImageProcessor {
+    public List<ProcessedImage> processImages(List<BufferedImage> images) {
+        // Create an executor service
+        ExecutorService executor = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors()
+        );
+        
+        try {
+            // Prepare image processing tasks
+            List<Callable<ProcessedImage>> processingTasks = images.stream()
+                .map(this::createImageProcessingTask)
+                .collect(Collectors.toList());
+            
+            // Execute all tasks
+            List<Future<ProcessedImage>> futures = executor.invokeAll(processingTasks);
+            
+            // Collect processed images
+            List<ProcessedImage> processedImages = new ArrayList<>();
+            for (Future<ProcessedImage> future : futures) {
+                try {
+                    processedImages.add(future.get());
+                } catch (ExecutionException e) {
+                    // Handle individual image processing errors
+                    System.err.println("Image processing failed: " + e.getMessage());
+                }
+            }
+            
+            return processedImages;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Image processing interrupted", e);
+        } finally {
+            executor.shutdown();
+        }
+    }
+    
+    private Callable<ProcessedImage> createImageProcessingTask(BufferedImage image) {
+        return () -> {
+            // Simulate image processing
+            BufferedImage processedImage = new BufferedImage(
+                image.getWidth(), 
+                image.getHeight(), 
+                BufferedImage.TYPE_INT_RGB
+            );
+            
+            for (int y = 0; y < image.getHeight(); y++) {
+                for (int x = 0; x < image.getWidth(); x++) {
+                    int rgb = image.getRGB(x, y);
+                    int processedRgb = processPixel(rgb);
+                    processedImage.setRGB(x, y, processedRgb);
+                }
+            }
+            
+            return new ProcessedImage(
+                processedImage, 
+                calculateImageComplexity(image)
+            );
+        };
+    }
+    
+    private int processPixel(int rgb) {
+        // Simulate image processing (e.g., grayscale conversion)
+        int r = (rgb >> 16) & 0xFF;
+        int g = (rgb >> 8) & 0xFF;
+        int b = rgb & 0xFF;
+        
+        int grayValue = (r + g + b) / 3;
+        return (grayValue << 16) | (grayValue << 8) | grayValue;
+    }
+    
+    private int calculateImageComplexity(BufferedImage image) {
+        // Simulate complexity calculation
+        return image.getWidth() * image.getHeight();
+    }
+    
+    // Processed Image model
+    public static class ProcessedImage {
+        private BufferedImage image;
+        private int complexity;
+        
+        public ProcessedImage(BufferedImage image, int complexity) {
+            this.image = image;
+            this.complexity = complexity;
+        }
+        
+        @Override
+        public String toString() {
+            return "ProcessedImage{" +
+                   "imageSize=" + image.getWidth() + "x" + image.getHeight() +
+                   ", complexity=" + complexity +
+                   '}';
+        }
+    }
+}
+                                        </code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+</body>
+</html>

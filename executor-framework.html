@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executor Framework - Java Multithreading</title>
+    <title>Executor Framework in Java</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="antialiased">
@@ -32,264 +31,43 @@
             
             <div class="page-body">
                 <div class="container-xl">
-                    <div class="row">
-                        <div class="col-12">
+                    <div class="row row-cards">
+                        <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body">
-                                    <h2>1. Understanding Executor Framework</h2>
-                                    
-                                    <div class="mb-3">
-                                        <h3>Pseudocode: Executor Framework Concept</h3>
-                                        <pre><code class="language-text">
-// Pseudocode for Executor Framework Management
-
-class ExecutorFramework:
-    task_queue = create_concurrent_queue()
-    thread_pool = create_thread_pool()
-    
-    function submit_task(task):
-        // Decouples task submission from execution
-        task_queue.add(task)
-        
-        if available_thread_in_pool():
-            execute_next_task_from_queue()
-    
-    function execute_task(task):
-        try:
-            result = task.run()
-            handle_task_success(result)
-        catch Exception:
-            handle_task_failure()
-        finally:
-            mark_thread_as_available()
-    
-    function shutdown():
-        stop_accepting_new_tasks()
-        wait_for_existing_tasks_to_complete()
-        terminate_thread_pool()
-                                        </code></pre>
-                                    </div>
-                                    
-                                    <div class="alert alert-important" role="alert">
-                                        <h4>Key Executor Framework Principles</h4>
-                                        <ul>
-                                            <li>Separate task submission from task execution</li>
-                                            <li>Manage thread lifecycle automatically</li>
-                                            <li>Provide flexible task management</li>
-                                            <li>Simplify concurrent programming</li>
-                                        </ul>
-                                    </div>
+                                    <h2 class="card-title">Technical Explanation</h2>
+                                    <p>Dive deep into the technical mechanisms of the Executor Framework</p>
+                                    <a href="executor-framework-technical.html" class="btn btn-primary">Explore Technical Details</a>
                                 </div>
                             </div>
-                            
-                            <div class="card mt-4">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
                                 <div class="card-body">
-                                    <h2>2. Real-World Scenario: Data Processing Pipeline</h2>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <h3>Problem Scenario</h3>
-                                            <ul>
-                                                <li>Large-scale data processing</li>
-                                                <li>Multiple transformation stages</li>
-                                                <li>Need for parallel and efficient processing</li>
-                                            </ul>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h3>Executor Framework Solution</h3>
-                                            <ul>
-                                                <li>Use Callable for complex tasks</li>
-                                                <li>Manage task execution and results</li>
-                                                <li>Handle exceptions gracefully</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="code-section mt-3">
-                                        <pre><code class="language-java">
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
-
-// Data Processing Task
-class DataProcessingTask implements Callable<ProcessedData> {
-    private RawData rawData;
-    
-    public DataProcessingTask(RawData rawData) {
-        this.rawData = rawData;
-    }
-    
-    @Override
-    public ProcessedData call() throws Exception {
-        // Simulate complex data processing
-        return processData(rawData);
-    }
-    
-    private ProcessedData processData(RawData rawData) throws InterruptedException {
-        // Simulate multiple processing stages
-        Thread.sleep((long) (Math.random() * 1000)); // Simulate processing time
-        
-        return new ProcessedData(
-            rawData.getId(),
-            rawData.getValue().toUpperCase(),
-            calculateComplexity(rawData)
-        );
-    }
-    
-    private int calculateComplexity(RawData rawData) {
-        return rawData.getValue().length();
-    }
-}
-
-// Data Model Classes
-class RawData {
-    private String id;
-    private String value;
-    
-    public RawData(String id, String value) {
-        this.id = id;
-        this.value = value;
-    }
-    
-    public String getId() { return id; }
-    public String getValue() { return value; }
-}
-
-class ProcessedData {
-    private String id;
-    private String processedValue;
-    private int complexity;
-    
-    public ProcessedData(String id, String processedValue, int complexity) {
-        this.id = id;
-        this.processedValue = processedValue;
-        this.complexity = complexity;
-    }
-    
-    @Override
-    public String toString() {
-        return "ProcessedData{" +
-               "id='" + id + '\'' +
-               ", processedValue='" + processedValue + '\'' +
-               ", complexity=" + complexity +
-               '}';
-    }
-}
-
-// Data Processing Pipeline
-public class DataProcessingPipeline {
-    public static void main(String[] args) {
-        // Create a thread pool with 4 threads
-        ExecutorService executor = Executors.newFixedThreadPool(4);
-        
-        // Prepare raw data
-        List<RawData> rawDataList = generateSampleData();
-        
-        // List to collect processing results
-        List<Future<ProcessedData>> processingResults = new ArrayList<>();
-        
-        // Submit processing tasks
-        for (RawData rawData : rawDataList) {
-            DataProcessingTask task = new DataProcessingTask(rawData);
-            Future<ProcessedData> future = executor.submit(task);
-            processingResults.add(future);
-        }
-        
-        // Collect and process results
-        for (Future<ProcessedData> result : processingResults) {
-            try {
-                ProcessedData processedData = result.get();
-                System.out.println("Processed: " + processedData);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-        
-        // Shutdown the executor
-        executor.shutdown();
-        
-        try {
-            // Wait for all tasks to complete
-            if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-        }
-    }
-    
-    // Generate sample data for processing
-    private static List<RawData> generateSampleData() {
-        List<RawData> rawDataList = new ArrayList<>();
-        rawDataList.add(new RawData("1", "hello"));
-        rawDataList.add(new RawData("2", "world"));
-        rawDataList.add(new RawData("3", "java"));
-        rawDataList.add(new RawData("4", "executor"));
-        rawDataList.add(new RawData("5", "framework"));
-        return rawDataList;
-    }
-}
-                                        </code></pre>
-                                    </div>
-                                    
-                                    <div class="mt-3">
-                                        <h3>Industry Impact</h3>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h4>Where Used</h4>
-                                                <ul>
-                                                    <li>Big Data Processing</li>
-                                                    <li>Machine Learning Pipelines</li>
-                                                    <li>Financial Data Analysis</li>
-                                                    <li>Image and Video Processing</li>
-                                                </ul>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <h4>Benefits</h4>
-                                                <ul>
-                                                    <li>Parallel Data Processing</li>
-                                                    <li>Efficient Resource Utilization</li>
-                                                    <li>Easy Exception Handling</li>
-                                                    <li>Scalable Architecture</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <h2 class="card-title">Real-World Examples</h2>
+                                    <p>Understand Executor Framework through practical, industry-relevant scenarios</p>
+                                    <a href="executor-framework-examples.html" class="btn btn-primary">View Examples</a>
                                 </div>
                             </div>
-                            
-                            <div class="card mt-4">
-                                <div class="card-body">
-                                    <h2>3. Advanced Executor Framework Techniques</h2>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h3>Invoking All Tasks</h3>
-                                                    <pre><code class="language-java">
-List<Callable<Result>> tasks = ...;
-List<Future<Result>> results = 
-    executor.invokeAll(tasks);
-                                                    </code></pre>
-                                                    <p>Execute multiple tasks and wait for all</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h3>Task with Timeout</h3>
-                                                    <pre><code class="language-java">
-Future<Result> future = executor.submit(task);
-Result result = future.get(5, TimeUnit.SECONDS);
-                                                    </code></pre>
-                                                    <p>Set maximum wait time for task completion</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h2>Executor Framework Overview</h2>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h3>1. Task Submission</h3>
+                                    <p>Decouple task submission from execution</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h3>2. Future and Callable</h3>
+                                    <p>Manage asynchronous task results</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h3>3. Execution Policies</h3>
+                                    <p>Flexible thread management strategies</p>
                                 </div>
                             </div>
                         </div>
@@ -300,7 +78,5 @@ Result result = future.get(5, TimeUnit.SECONDS);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/js/tabler.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
 </body>
 </html>
