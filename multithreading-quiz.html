@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Multithreading Comprehensive Quiz</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.2.0/dist/css/tabler.min.css">
+    <style>
+        body { background-color: #f4f6ff; }
+        .quiz-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .options label {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .options label:hover {
+            background-color: #dee2e6;
+        }
+        .options input {
+            margin-right: 10px;
+        }
+        .correct { background-color: #d4edda !important; }
+        .incorrect { background-color: #f8d7da !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="quiz-container">
+            <h1 class="text-center mb-4">Java Multithreading Quiz</h1>
+            <div id="quiz"></div>
+            <div class="text-center mt-4">
+                <button id="submit" class="btn btn-primary">Submit Quiz</button>
+                <button id="restart" class="btn btn-secondary" style="display:none;">Restart Quiz</button>
+            </div>
+            <div id="results" class="mt-4 text-center"></div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // Thread Creation Concepts
+            {
+                question: "Which method is used to start a thread in Java?",
+                options: [
+                    "run()", 
+                    "start()", 
+                    "execute()", 
+                    "begin()"
+                ],
+                correctAnswer: "start()"
+            },
+            {
+                question: "When extending Thread class, what method must you override?",
+                options: [
+                    "main()", 
+                    "run()", 
+                    "execute()", 
+                    "start()"
+                ],
+                correctAnswer: "run()"
+            },
+            {
+                question: "What is the advantage of implementing Runnable over extending Thread?",
+                options: [
+                    "Faster thread creation", 
+                    "Allows multiple interface implementation", 
+                    "Guarantees thread safety", 
+                    "Reduces memory usage"
+                ],
+                correctAnswer: "Allows multiple interface implementation"
+            },
+            
+            // Thread Synchronization Concepts
+            {
+                question: "What keyword is used to create a synchronized method?",
+                options: [
+                    "thread-safe", 
+                    "synchronized", 
+                    "lock", 
+                    "atomic"
+                ],
+                correctAnswer: "synchronized"
+            },
+            {
+                question: "Which class provides atomic integer operations?",
+                options: [
+                    "SynchronizedInteger", 
+                    "ConcurrentInteger", 
+                    "AtomicInteger", 
+                    "SafeInteger"
+                ],
+                correctAnswer: "AtomicInteger"
+            },
+            {
+                question: "What is the primary purpose of synchronization?",
+                options: [
+                    "To increase thread speed", 
+                    "To prevent race conditions", 
+                    "To reduce memory usage", 
+                    "To create more threads"
+                ],
+                correctAnswer: "To prevent race conditions"
+            },
+            
+            // Thread Communication Concepts
+            {
+                question: "Which method releases the lock and puts a thread in waiting state?",
+                options: [
+                    "pause()", 
+                    "wait()", 
+                    "sleep()", 
+                    "hold()"
+                ],
+                correctAnswer: "wait()"
+            },
+            {
+                question: "What interface is used for tasks that return a value?",
+                options: [
+                    "Runnable", 
+                    "Executable", 
+                    "Callable", 
+                    "Processable"
+                ],
+                correctAnswer: "Callable"
+            },
+            {
+                question: "Which collection is best for producer-consumer scenarios?",
+                options: [
+                    "ArrayList", 
+                    "BlockingQueue", 
+                    "HashSet", 
+                    "LinkedList"
+                ],
+                correctAnswer: "BlockingQueue"
+            },
+            
+            // Thread Pools Concepts
+            {
+                question: "Which method creates a thread pool with a fixed number of threads?",
+                options: [
+                    "Executors.newCachedThreadPool()", 
+                    "Executors.newSingleThreadExecutor()", 
+                    "Executors.newFixedThreadPool()", 
+                    "Executors.newScheduledThreadPool()"
+                ],
+                correctAnswer: "Executors.newFixedThreadPool()"
+            },
+            {
+                question: "What is the primary advantage of using thread pools?",
+                options: [
+                    "Unlimited thread creation", 
+                    "Reusing threads", 
+                    "Removing all threads", 
+                    "Creating faster threads"
+                ],
+                correctAnswer: "Reusing threads"
+            },
+            {
+                question: "Which type of thread pool creates threads as needed?",
+                options: [
+                    "Fixed Thread Pool", 
+                    "Cached Thread Pool", 
+                    "Scheduled Thread Pool", 
+                    "Single Thread Pool"
+                ],
+                correctAnswer: "Cached Thread Pool"
+            },
+            
+            // Executor Framework Concepts
+            {
+                question: "What does the submit() method return?",
+                options: [
+                    "void", 
+                    "Thread", 
+                    "Future", 
+                    "Runnable"
+                ],
+                correctAnswer: "Future"
+            },
+            {
+                question: "Which method waits for all tasks to complete in ExecutorService?",
+                options: [
+                    "waitAll()", 
+                    "invokeAll()", 
+                    "completeAll()", 
+                    "awaitTermination()"
+                ],
+                correctAnswer: "invokeAll()"
+            },
+            {
+                question: "What interface represents a task that returns a value?",
+                options: [
+                    "Runnable", 
+                    "Executor", 
+                    "Callable", 
+                    "Future"
+                ],
+                correctAnswer: "Callable"
+            },
+            
+            // Concurrent Collections Concepts
+            {
+                question: "Which collection provides thread-safe key-value storage?",
+                options: [
+                    "HashMap", 
+                    "ConcurrentHashMap", 
+                    "SynchronizedMap", 
+                    "ThreadSafeMap"
+                ],
+                correctAnswer: "ConcurrentHashMap"
+            },
+            {
+                question: "What is the key feature of CopyOnWriteArrayList?",
+                options: [
+                    "Faster writes", 
+                    "Immutable snapshots", 
+                    "Smaller memory footprint", 
+                    "Faster reads"
+                ],
+                correctAnswer: "Immutable snapshots"
+            },
+            {
+                question: "Which method blocks if a queue is full?",
+                options: [
+                    "add()", 
+                    "offer()", 
+                    "put()", 
+                    "insert()"
+                ],
+                correctAnswer: "put()"
+            },
+            
+            // Advanced Multithreading Concepts
+            {
+                question: "What prevents a thread from accessing a shared resource simultaneously?",
+                options: [
+                    "Thread.sleep()", 
+                    "synchronized keyword", 
+                    "Thread.yield()", 
+                    "Thread.stop()"
+                ],
+                correctAnswer: "synchronized keyword"
+            },
+            {
+                question: "What method immediately stops thread execution?",
+                options: [
+                    "stop()", 
+                    "interrupt()", 
+                    "terminate()", 
+                    "kill()"
+                ],
+                correctAnswer: "interrupt()"
+            },
+            {
+                question: "Which method releases the current thread's lock and allows another thread to execute?",
+                options: [
+                    "pause()", 
+                    "yield()", 
+                    "stop()", 
+                    "end()"
+                ],
+                correctAnswer: "yield()"
+            },
+            
+            // Complex Multithreading Scenarios
+            {
+                question: "In a producer-consumer scenario, what prevents a consumer from reading when no data is available?",
+                options: [
+                    "synchronized block", 
+                    "wait() method", 
+                    "Thread.sleep()", 
+                    "interrupt()"
+                ],
+                correctAnswer: "wait() method"
+            },
+            {
+                question: "What ensures that only one thread can access a critical section at a time?",
+                options: [
+                    "Thread prioritization", 
+                    "Mutual exclusion", 
+                    "Thread multiplication", 
+                    "Thread division"
+                ],
+                correctAnswer: "Mutual exclusion"
+            },
+            {
+                question: "Which construct helps manage thread communication in a more flexible way?",
+                options: [
+                    "synchronized method", 
+                    "Condition variable", 
+                    "Thread.sleep()", 
+                    "Thread.yield()"
+                ],
+                correctAnswer: "Condition variable"
+            },
+            
+            // Performance and Design Concepts
+            {
+                question: "What is the primary goal of thread pooling?",
+                options: [
+                    "Create unlimited threads", 
+                    "Reduce thread creation overhead", 
+                    "Make threads faster", 
+                    "Remove thread limits"
+                ],
+                correctAnswer: "Reduce thread creation overhead"
+            },
+            {
+                question: "Which approach reduces lock contention in concurrent collections?",
+                options: [
+                    "Full collection locking", 
+                    "Segment-based locking", 
+                    "Random locking", 
+                    "No locking"
+                ],
+                correctAnswer: "Segment-based locking"
+            },
+            {
+                question: "What mechanism allows safe publication of immutable objects?",
+                options: [
+                    "Synchronization", 
+                    "Copy-on-write", 
+                    "Thread pooling", 
+                    "Atomic operations"
+                ],
+                correctAnswer: "Copy-on-write"
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz');
+        const resultsContainer = document.getElementById('results');
+        const submitButton = document.getElementById('submit');
+        const restartButton = document.getElementById('restart');
+
+        function buildQuiz() {
+            // Shuffle questions
+            const shuffledQuestions = quizData.sort(() => 0.5 - Math.random()).slice(0, 30);
+            
+            const output = [];
+            shuffledQuestions.forEach((currentQuestion, questionNumber) => {
+                const options = [];
+                const shuffledOptions = currentQuestion.options.sort(() => 0.5 - Math.random());
+
+                for (let i = 0; i < shuffledOptions.length; i++) {
+                    options.push(
+                        `<label>
+                            <input type="radio" name="question${questionNumber}" value="${shuffledOptions[i]}">
+                            ${shuffledOptions[i]}
+                        </label>`
+                    );
+                }
+
+                output.push(
+                    `<div class="question">
+                        <h3>Question ${questionNumber + 1}</h3>
+                        <p>${currentQuestion.question}</p>
+                        <div class="options">
+                            ${options.join('')}
+                        </div>
+                    </div>`
+                );
+            });
+
+            quizContainer.innerHTML = output.join('');
+        }
+
+        function showResults() {
+            const answerContainers = quizContainer.querySelectorAll('.options');
+            let numCorrect = 0;
+
+            quizData.forEach((currentQuestion, questionNumber) => {
+                const answerContainer = answerContainers[questionNumber];
+                const selector = `input[name=question${questionNumber}]:checked`;
+                const userAnswer = (answerContainer.querySelector(selector) || {}).value;
+
+                if (userAnswer === currentQuestion.correctAnswer) {
+                    numCorrect++;
+                    answerContainers[questionNumber].style.color = 'green';
+                } else {
+                    answerContainers[questionNumber].style.color = 'red';
+                }
+            });
+
+            resultsContainer.innerHTML = `
+                <h2>Your Score: ${numCorrect} out of 30</h2>
+                <p>Percentage: ${Math.round((numCorrect/30)*100)}%</p>
+            `;
+
+            submitButton.style.display = 'none';
+            restartButton.style.display = 'inline-block';
+        }
+
+        buildQuiz();
+
+        submitButton.addEventListener('click', showResults);
+        restartButton.addEventListener('click', () => {
+            buildQuiz();
+            resultsContainer.innerHTML = '';
+            submitButton.style.display = 'inline-block';
+            restartButton.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
