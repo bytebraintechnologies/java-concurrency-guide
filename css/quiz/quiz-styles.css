@@ -74,9 +74,6 @@ body {
     font-size: 2.5rem;
     margin-bottom: 1rem;
 }
-.progress-container {
-    margin-bottom: 2rem;
-}
 nav.navbar {
     background-color: #ffffff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);

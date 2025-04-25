@@ -47,17 +47,7 @@
             <h1 class="text-center mb-4">Java Executor Framework Quiz</h1>
             <p class="text-center mb-4">Test your knowledge of the Java Executor Framework with this 5-question quiz.</p>
             
-            <!-- Progress bar -->
-            <div class="progress-container" id="progress-container">
-                <div class="d-flex justify-content-between mb-1">
-                    <div>Progress</div>
-                    <div id="progress-text">0/5</div>
-                </div>
-                <div class="progress">
-                    <div class="progress-bar" id="progress-bar" style="width: 0%" role="progressbar"></div>
-                </div>
-            </div>
-            
+
             <!-- Quiz content -->
             <div id="quiz"></div>
             
@@ -146,8 +136,6 @@
         ];
 
         const quizContainer = document.getElementById('quiz');
-        const progressBar = document.getElementById('progress-bar');
-        const progressText = document.getElementById('progress-text');
         const submitButton = document.getElementById('submit');
         const restartButton = document.getElementById('restart');
         const scoreCard = document.getElementById('score-card');
